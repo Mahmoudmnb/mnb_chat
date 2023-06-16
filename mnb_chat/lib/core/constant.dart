@@ -15,11 +15,12 @@ class Constant {
   static Color sendMessageColor = const Color.fromRGBO(146, 212, 221, 1);
   static Color resivedMessageColor = const Color.fromRGBO(255, 255, 255, 1);
   static Color repliedResivedMessageColor =
-      const Color.fromARGB(255, 236, 227, 227);
+      const Color.fromARGB(255, 223, 210, 210);
   static Color messgeRowColor = const Color.fromARGB(255, 136, 133, 133);
 
   static Color dateColor = const Color.fromRGBO(89, 90, 90, 1);
-  static Color repliedSendMessageColor = const Color.fromRGBO(166, 213, 220, 1);
+  static Color repliedSendMessageColor =
+      const Color.fromARGB(255, 188, 225, 229);
   static Color inputBottomColor = const Color.fromRGBO(248, 248, 248, 1);
   static Color textInputColor = const Color.fromARGB(255, 213, 204, 204);
 

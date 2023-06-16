@@ -212,7 +212,9 @@ class _ChatePageState extends State<ChatePage> {
             .toString()),
         actions: [
           context.watch<ChatProvider>().toMeSelectedMessage.isEmpty &&
-                  context.read<ChatProvider>().fromMeSelectedMessage.length == 1
+                  context.read<ChatProvider>().fromMeSelectedMessage.length ==
+                      1 &&
+                  context.watch<ChatProvider>().selectedMessage!.type != 'Image'
               ? IconButton(
                   onPressed: () {
                     context.read<ChatProvider>().editOnTab(context);

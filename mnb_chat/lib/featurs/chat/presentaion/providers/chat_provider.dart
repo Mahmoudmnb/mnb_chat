@@ -18,38 +18,39 @@ import '../../../auth/models/user_model.dart';
 import '../../models/message.dart';
 
 class ChatProvider extends ChangeNotifier {
-  Map<String, int> numOfNewMessages = {};
-  final Map<String, double> _imageProgressValue = {};
-  get imgeProgressValue => _imageProgressValue;
+//!                     **********************************       variabels      ***************************************************
+  //* this is an opject of the user whom i'm chatting with him
+  UserModel? friend;
 
-  String emojiText = '';
-  bool checkBoxKey = false;
-  bool isReplied = false;
-  bool isConvertedMode = false;
-
+  //* this is to know if its a new message in the textFild or edit message
   bool _editMode = false;
   get editMode => _editMode;
-
-  String? _inputText = '';
-  get inputText => _inputText;
-  set setConvertedMode(bool value) {
-    isConvertedMode = value;
-    notifyListeners();
-  }
-
-  set setInputText(String value) {
-    _inputText = value;
-    notifyListeners();
-  }
-
   set setEditMode(bool value) {
     _editMode = value;
     notifyListeners();
   }
 
-  UserModel? friend;
+  //* this is  to know if there are a text in the text field or if its empty
+  String? _inputText = '';
+  get inputText => _inputText;
+  set setInputText(String value) {
+    _inputText = value;
+    notifyListeners();
+  }
 
-//!                     **********************************       variabels      ***************************************************
+  //* this is for alertDialog in delete message checkBox
+  bool checkBoxKey = false;
+  //* this is to know if there a converted message or not
+
+  bool isConvertedMode = false;
+  set setConvertedMode(bool value) {
+    isConvertedMode = value;
+    notifyListeners();
+  }
+
+  //* this is to know if there a replied message or not
+  bool isReplied = false;
+
   //* this is controllers for textEditing and listView
   TextEditingController controller = TextEditingController();
   ScrollController scrollController = ScrollController();
@@ -330,7 +331,6 @@ class ChatProvider extends ChangeNotifier {
       fromMeSelectedMessage = [];
       toMeSelectedMessage = [];
       selectedMessages = [];
-      emojiText = '';
       setEditMode = false;
       await FirebaseFirestore.instance
           .collection('messages')
@@ -361,7 +361,6 @@ class ChatProvider extends ChangeNotifier {
             Constant.currentUsre);
         controller.text = '';
         _inputText = '';
-        emojiText = '';
         await FirebaseFirestore.instance
             .collection('messages')
             .doc(chatId)
@@ -469,7 +468,6 @@ class ChatProvider extends ChangeNotifier {
             .update({'isSent': true, 'text': await event.ref.getDownloadURL()});
         sendPushMessage('Image', Constant.currentUsre.name, friend!.token,
             Constant.currentUsre.phoneNamber, chatId, friend!);
-        _imageProgressValue[id] = 0;
       }
     });
     moveToEnd();
@@ -482,7 +480,7 @@ class ChatProvider extends ChangeNotifier {
         duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
   }
 
-  //* this is for generating a unique id
+  //* this is for generating a unique id for messages
   String generateId() {
     return const Uuid().v1();
   }
@@ -495,6 +493,7 @@ class ChatProvider extends ChangeNotifier {
     toMeSelectedMessage = [];
   }
 
+  //* this is for creating a new chat with new friend or open an old chat
   Future<String> createChat() async {
     var first = await FirebaseFirestore.instance
         .collection('messages')
@@ -571,6 +570,7 @@ class ChatProvider extends ChangeNotifier {
     }
   }
 
+  //* when click on edit icon in alternative appBar to edit a message
   Future<void> editOnTab(BuildContext context) async {
     //* open keyboard on edit
     _editMode = true;
@@ -583,11 +583,12 @@ class ChatProvider extends ChangeNotifier {
     FocusScope.of(context).requestFocus(focusNode);
   }
 
+  //* when click on copy message in alternative appBar to copy messages
   copyOnTab() {
     String clipText = '';
     for (var element in copiedMessages) {
       clipText += element.text;
-      clipText += '      \n';
+      clipText += '\n';
     }
     Clipboard.setData(ClipboardData(text: clipText));
     setMainAppBar = true;
@@ -596,6 +597,7 @@ class ChatProvider extends ChangeNotifier {
     toMeSelectedMessage = [];
   }
 
+  //* when click on reply in alternative bottomSeet to reply a message
   replyOnTab() {
     setMainAppBar = true;
     isReplied = true;
@@ -603,11 +605,13 @@ class ChatProvider extends ChangeNotifier {
     fromMeSelectedMessage = [];
     toMeSelectedMessage = [];
   }
+  //* when click on reply in alternative bottomSeet to cancel reply a message
 
   cancelReplyModeOnTab() {
     isReplied = false;
     notifyListeners();
   }
+  //* when click on reply in alternative bottomSeet to convert  a message to another chat
 
   convertMessageOnTab(BuildContext context) {
     isConvertedMode = true;
@@ -619,6 +623,7 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  //* when click on reply in alternative bottomSeet to send converted  message to another chat
   sendConvertedMessage(String chatId) async {
     for (MessageModel element in copiedMessages) {
       var message = MessageModel(
@@ -644,16 +649,6 @@ class ChatProvider extends ChangeNotifier {
     }
     isConvertedMode = false;
 
-    notifyListeners();
-  }
-
-  imgageProgressDownload(double progress, String imageId) {
-    _imageProgressValue[imageId] = progress;
-    notifyListeners();
-  }
-
-  onDoneImageDownlad(String imageId) {
-    _imageProgressValue.remove(imageId);
     notifyListeners();
   }
 }

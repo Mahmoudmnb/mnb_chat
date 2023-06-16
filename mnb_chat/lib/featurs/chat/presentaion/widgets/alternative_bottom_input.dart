@@ -10,10 +10,14 @@ class AlternativeBottomInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double deviceHeight = MediaQuery.of(context).size.height -
+        (MediaQuery.of(context).padding.bottom -
+            MediaQuery.of(context).padding.top);
     return Container(
-      height: 50,
+      height: deviceHeight * 0.06,
       width: double.infinity,
-      decoration: const BoxDecoration(color: Colors.purple),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -33,20 +37,25 @@ class AlternativeBottomInput extends StatelessWidget {
                     context.read<ChatProvider>().replyOnTab();
                   },
                   label: const Text(
-                    'reply',
+                    'Reply',
                     style: TextStyle(fontSize: 20),
                   ),
                   icon: const Icon(Icons.arrow_back))
               : const SizedBox.shrink(),
-          TextButton.icon(
-              onPressed: () {
+          InkWell(
+              onTap: () {
                 context.read<ChatProvider>().convertMessageOnTab(context);
               },
-              label: const Text(
-                'Convert',
-                style: TextStyle(fontSize: 20),
-              ),
-              icon: const Icon(Icons.arrow_forward)),
+              child: const Row(
+                children: [
+                  Text(
+                    'Convert',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 5),
+                  Icon(Icons.arrow_forward)
+                ],
+              )),
         ],
       ),
     );

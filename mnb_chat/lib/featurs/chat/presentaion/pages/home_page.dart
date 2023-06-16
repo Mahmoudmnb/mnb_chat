@@ -12,7 +12,7 @@ import '../../../auth/models/user_model.dart';
 import '../../../auth/presentaion/pages/auth_page.dart';
 import '../providers/chat_provider.dart';
 
-import '../providers/state_provider.dart';
+import '../providers/home_provider.dart';
 import 'chat_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -210,12 +210,11 @@ class _HomePageState extends State<HomePage> {
                 child: const Text('LOG OUT')),
             TextButton(
                 onPressed: () async {
-                  if (context.read<StateProvider>().themeMode ==
+                  if (context.read<HomeProvider>().themeMode ==
                       ThemeMode.light) {
-                    context.read<StateProvider>().setThemeMode = ThemeMode.dark;
+                    context.read<HomeProvider>().setThemeMode = ThemeMode.dark;
                   } else {
-                    context.read<StateProvider>().setThemeMode =
-                        ThemeMode.light;
+                    context.read<HomeProvider>().setThemeMode = ThemeMode.light;
                   }
                 },
                 child: const Text('change theme')),

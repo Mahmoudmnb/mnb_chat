@@ -29,41 +29,51 @@ class RepliedMessagePop extends StatelessWidget {
       }
     }
     return Container(
+      constraints: BoxConstraints(
+          maxWidth: deviceSize.width * 0.7, minWidth: deviceSize.width * 0.15),
       margin: const EdgeInsets.all(2),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      width: deviceSize.width * 0.6,
       decoration: BoxDecoration(
-          color: isme ? Colors.yellow : Colors.amber,
+          color: isme
+              ? Theme.of(context).colorScheme.onBackground
+              : Theme.of(context).colorScheme.secondary,
           borderRadius: BorderRadius.only(
               topRight: const Radius.circular(15),
               bottomLeft: Radius.circular(isme ? 15 : 0),
               bottomRight: Radius.circular(isme ? 0 : 15),
               topLeft: const Radius.circular(15))),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment:
+            isme ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 5),
-          Text(message.fromName),
-          const SizedBox(height: 5),
           Row(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(width: 5),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: isme ? Colors.yellow[600] : Colors.amber[600],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        message.repliedText!,
-                      )
-                    ],
-                  ),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: isme
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(context).colorScheme.onSecondary,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      message.fromName,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      message.repliedText!,
+                    )
+                  ],
                 ),
               ),
             ],
@@ -74,10 +84,15 @@ class RepliedMessagePop extends StatelessWidget {
             style: const TextStyle(fontSize: 20),
           ),
           Row(
+            mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                  '${(message.date).toDate().hour}:${(message.date).toDate().minute}'),
+                '${(message.date).toDate().hour}:${(message.date).toDate().minute}',
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onError,
+                    fontWeight: FontWeight.bold),
+              ),
               const SizedBox(width: 5),
               isme
                   ? message.isReseved == true

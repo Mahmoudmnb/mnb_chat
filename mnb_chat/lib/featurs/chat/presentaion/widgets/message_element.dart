@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mnb_chat/featurs/chat/presentaion/providers/state_provider.dart';
+import 'package:mnb_chat/featurs/chat/presentaion/providers/home_provider.dart';
 import 'package:mnb_chat/featurs/chat/presentaion/widgets/radio_button.dart';
 import 'package:provider/provider.dart';
 
@@ -35,7 +35,7 @@ class MessageRow extends StatelessWidget {
           borderRadius: BorderRadius.circular(15),
           color: !context.read<ChatProvider>().isMainAppBar &&
                   context.watch<ChatProvider>().selectedMessages[index]
-              ? context.watch<StateProvider>().themeMode == ThemeMode.light
+              ? context.watch<HomeProvider>().themeMode == ThemeMode.light
                   ? Colors.grey.shade400
                   : Colors.white24
               : Colors.transparent),

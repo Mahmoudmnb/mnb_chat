@@ -14,7 +14,7 @@ import 'featurs/auth/presentaion/pages/auth_page.dart';
 import 'featurs/auth/presentaion/provider/auth_provider.dart';
 import 'featurs/chat/presentaion/pages/home_page.dart';
 import 'featurs/chat/presentaion/providers/chat_provider.dart';
-import 'featurs/chat/presentaion/providers/state_provider.dart';
+import 'featurs/chat/presentaion/providers/home_provider.dart';
 import 'firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -40,7 +40,7 @@ Future<void> main(List<String> args) async {
           create: (context) => ChatProvider(),
         ),
         ChangeNotifierProvider(
-          create: (context) => StateProvider(),
+          create: (context) => HomeProvider(),
         )
       ],
       child: const MyApp(),
@@ -61,15 +61,15 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       theme: Constant.lightTheme,
       darkTheme: Constant.darkTheme,
-      themeMode: context.watch<StateProvider>().themeMode,
+      themeMode: context.watch<HomeProvider>().themeMode,
       debugShowCheckedModeBanner: false,
       home: FutureBuilder(
         future: SharedPreferences.getInstance(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data?.getString('currentUser') != null) {
-                UserModel currentUser = UserModel.fromJson(
-                json.decode(snapshot.data!.getString('currentUser')!));
+              UserModel currentUser = UserModel.fromJson(
+                  json.decode(snapshot.data!.getString('currentUser')!));
               Constant.currentUsre = currentUser;
               return HomePage(user: currentUser);
             } else {
