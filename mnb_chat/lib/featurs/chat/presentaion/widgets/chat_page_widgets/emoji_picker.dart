@@ -2,7 +2,8 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/chat_provider.dart';
+import '../../providers/chat_provider.dart';
+
 
 class EmojiPickerBuilder extends StatelessWidget {
   const EmojiPickerBuilder({super.key});

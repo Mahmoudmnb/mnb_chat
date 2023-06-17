@@ -22,7 +22,7 @@ class Constant {
   static Color repliedSendMessageColor =
       const Color.fromARGB(255, 188, 225, 229);
   static Color inputBottomColor = const Color.fromRGBO(248, 248, 248, 1);
-  static Color textInputColor = const Color.fromARGB(255, 213, 204, 204);
+  static Color textInputColor = const Color.fromARGB(255, 233, 227, 227);
 
   //! Home page colors
   static Color subText = const Color.fromRGBO(103, 103, 103, 1);
@@ -31,12 +31,13 @@ class Constant {
   static Color dChatBackgroundColor = const Color.fromARGB(0, 24, 23, 23);
   static Color dAppBarColor = const Color.fromRGBO(19, 19, 19, 1);
   static Color dIconColor = const Color.fromRGBO(213, 174, 13, 1);
-  static Color dSndMessageColor = const Color.fromRGBO(28, 109, 120, 1);
+  static Color dSndMessageColor = const Color.fromARGB(255, 87, 181, 194);
   static Color dDateColor = const Color.fromRGBO(117, 115, 115, 1);
-  static Color dResivedMessageColor = const Color.fromRGBO(19, 19, 19, 1);
+  static Color dResivedMessageColor = const Color.fromARGB(255, 43, 42, 42);
   static Color dRepliedResivedMessageColor =
       const Color.fromARGB(255, 48, 46, 46);
-  static Color dRepliedSendMessageColor = const Color.fromRGBO(82, 140, 147, 1);
+  static Color dRepliedSendMessageColor =
+      const Color.fromARGB(255, 126, 185, 192);
   static Color dInputBottomColor = const Color.fromRGBO(19, 19, 19, 1);
   static Color dTextInputColor = const Color.fromRGBO(29, 29, 29, 1);
 
@@ -60,14 +61,15 @@ class Constant {
       textTheme: const TextTheme(titleLarge: TextStyle(color: Colors.white)),
       colorScheme: ColorScheme(
           brightness: Brightness.light,
-          primary: dSndMessageColor,
+          primary: Colors.white70,
           onPrimary: dRepliedSendMessageColor,
           secondary: dResivedMessageColor,
           onSecondary: dRepliedResivedMessageColor,
           error: dIconColor,
           onError: dDateColor,
           background: dChatBackgroundColor,
-          onBackground: Colors.tealAccent,
+          onBackground: dSndMessageColor,
+          surfaceTint: dTextInputColor,
           surface: dAppBarColor,
           onSurface: dInputBottomColor));
 }

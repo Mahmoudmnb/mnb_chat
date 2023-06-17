@@ -6,7 +6,7 @@ import '../../../../core/constant.dart';
 import '../../../auth/models/user_model.dart';
 import '../../models/message.dart';
 import '../providers/chat_provider.dart';
-import '../widgets/widgets.dart';
+import '../widgets/chat_page_widgets/chat_page_widgets.dart';
 
 class ChatePage extends StatefulWidget {
   final UserModel friend;
@@ -21,12 +21,13 @@ class _ChatePageState extends State<ChatePage> {
   late UserModel friend;
   double deviceWidth = 0;
   double deviceHight = 0;
+  late ChatProvider readContext;
+  late ChatProvider watchContext;
+
   @override
   void initState() {
     chatId = widget.chatId;
     friend = widget.friend;
-    // context.read<ChatProvider>().controller = TextEditingController();
-    // context.read<ChatProvider>().scrollController = ScrollController();
     if (context.read<ChatProvider>().isConvertedMode) {
       context.read<ChatProvider>().sendConvertedMessage(chatId);
     }
@@ -35,27 +36,29 @@ class _ChatePageState extends State<ChatePage> {
 
   @override
   void dispose() {
-    // context.read<ChatProvider>().controller.dispose();
-    // context.read<ChatProvider>().scrollController.dispose();
+    readContext.friend = null;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     //* this is for getting device hight and width
+    readContext = context.read<ChatProvider>();
+    watchContext = context.watch<ChatProvider>();
+
     deviceWidth = MediaQuery.of(context).size.width;
     deviceHight = deviceHight = MediaQuery.of(context).size.height -
         (MediaQuery.of(context).padding.top +
             MediaQuery.of(context).padding.bottom);
     return WillPopScope(
-      onWillPop: () => context.read<ChatProvider>().willPopScopeOnTab(),
+      onWillPop: () => readContext.willPopScopeOnTab(),
       child: SafeArea(
         child: Scaffold(
             backgroundColor: Theme.of(context).colorScheme.background,
-            bottomNavigationBar: context.watch<ChatProvider>().showImojiPicker
+            bottomNavigationBar: watchContext.showImojiPicker
                 ? const EmojiPickerBuilder()
                 : const SizedBox.shrink(),
-            appBar: context.watch<ChatProvider>().isMainAppBar
+            appBar: watchContext.isMainAppBar
                 ? mainAppBar(friend.name)
                 : aternativeAppBar(),
             body: GestureDetector(
@@ -82,8 +85,7 @@ class _ChatePageState extends State<ChatePage> {
                         return ListView.builder(
                           padding: const EdgeInsets.all(5),
                           physics: const BouncingScrollPhysics(),
-                          controller:
-                              context.watch<ChatProvider>().scrollController,
+                          controller: watchContext.scrollController,
                           reverse: true,
                           itemCount: snapshot.data!.docs.length,
                           itemBuilder: (ctx, index) {
@@ -100,7 +102,7 @@ class _ChatePageState extends State<ChatePage> {
                                 ? const SizedBox.shrink()
                                 : GestureDetector(
                                     onTap: () {
-                                      context.read<ChatProvider>().onTabMessage(
+                                      readContext.onTabMessage(
                                           index, isme, message, context);
                                     },
                                     onLongPress: () {
@@ -126,8 +128,7 @@ class _ChatePageState extends State<ChatePage> {
                       }
                     },
                   )),
-                  !context.read<ChatProvider>().isMainAppBar &&
-                          !context.read<ChatProvider>().editMode
+                  !readContext.isMainAppBar && !readContext.editMode
                       ? const AlternativeBottomInput()
                       : InputBottom(chatId: chatId, freind: friend),
                 ],
@@ -205,25 +206,24 @@ class _ChatePageState extends State<ChatePage> {
         foregroundColor: Theme.of(context).colorScheme.error,
         backgroundColor: Theme.of(context).colorScheme.surface,
         leading: IconButton(
-            onPressed: () => context.read<ChatProvider>().cancelOnTab(),
+            onPressed: () => readContext.cancelOnTab(),
             icon: const Icon(Icons.cancel)),
-        title: Text((context.watch<ChatProvider>().toMeSelectedMessage.length +
-                context.watch<ChatProvider>().fromMeSelectedMessage.length)
+        title: Text((watchContext.toMeSelectedMessage.length +
+                watchContext.fromMeSelectedMessage.length)
             .toString()),
         actions: [
-          context.watch<ChatProvider>().toMeSelectedMessage.isEmpty &&
-                  context.read<ChatProvider>().fromMeSelectedMessage.length ==
-                      1 &&
-                  context.watch<ChatProvider>().selectedMessage!.type != 'Image'
+          watchContext.toMeSelectedMessage.isEmpty &&
+                  readContext.fromMeSelectedMessage.length == 1 &&
+                  watchContext.selectedMessage!.type != 'Image'
               ? IconButton(
                   onPressed: () {
-                    context.read<ChatProvider>().editOnTab(context);
+                    readContext.editOnTab(context);
                   },
                   icon: const Icon(Icons.edit))
               : const SizedBox.shrink(),
           IconButton(
               onPressed: () {
-                context.read<ChatProvider>().copyOnTab();
+                readContext.copyOnTab();
               },
               icon: const Icon(Icons.copy)),
           IconButton(

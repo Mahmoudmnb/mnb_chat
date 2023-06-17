@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-import '../../../auth/models/user_model.dart';
-import '../../models/message.dart';
+import '../../../../auth/models/user_model.dart';
+import '../../../models/message.dart';
 
 class MessagePop extends StatelessWidget {
   final bool isme;
@@ -29,6 +29,15 @@ class MessagePop extends StatelessWidget {
             .doc(message.messageId)
             .update({'isReseved': true});
       }
+    } else {
+      if (message.isReseved == true && message.isSent == false) {
+        FirebaseFirestore.instance
+            .collection('messages')
+            .doc(chatId)
+            .collection('msg')
+            .doc(message.messageId)
+            .update({'isSent': true});
+      }
     }
 
     return Container(
@@ -50,7 +59,9 @@ class MessagePop extends StatelessWidget {
         children: [
           Text(
             message.text,
-            style: TextStyle(fontSize: deviceSize.width * 0.05),
+            style: TextStyle(
+                fontSize: deviceSize.width * 0.05,
+                color: Theme.of(context).textTheme.titleLarge!.color),
           ),
           const SizedBox(height: 5),
           Row(

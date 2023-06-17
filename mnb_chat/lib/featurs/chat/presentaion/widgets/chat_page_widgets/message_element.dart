@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mnb_chat/featurs/chat/presentaion/providers/home_provider.dart';
-import 'package:mnb_chat/featurs/chat/presentaion/widgets/radio_button.dart';
+import 'package:mnb_chat/featurs/chat/presentaion/widgets/chat_page_widgets/radio_button.dart';
 import 'package:provider/provider.dart';
 
-import '../../../auth/models/user_model.dart';
-import '../../models/message.dart';
-import '../providers/chat_provider.dart';
+import '../../../../auth/models/user_model.dart';
+import '../../../models/message.dart';
+import '../../providers/chat_provider.dart';
 import 'image_pop.dart';
 import 'message_pop.dart';
-import 'repied_message_pop.dart';
+import 'replied_message_pop.dart';
 
 class MessageRow extends StatelessWidget {
   final int index;

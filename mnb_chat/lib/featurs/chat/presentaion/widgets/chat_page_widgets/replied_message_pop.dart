@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-import '../../models/message.dart';
+import '../../../models/message.dart';
 
 class RepliedMessagePop extends StatelessWidget {
   final MessageModel message;
@@ -67,11 +67,16 @@ class RepliedMessagePop extends StatelessWidget {
                   children: [
                     Text(
                       message.fromName,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.titleLarge!.color),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       message.repliedText!,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).textTheme.titleLarge!.color),
                     )
                   ],
                 ),

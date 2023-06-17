@@ -2,10 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:mnb_chat/featurs/chat/presentaion/providers/home_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../../../auth/models/user_model.dart';
-import '../providers/chat_provider.dart';
+import '../../../../auth/models/user_model.dart';
+import '../../providers/chat_provider.dart';
+
 
 class InputBottom extends StatelessWidget {
   final String chatId;
@@ -91,12 +93,13 @@ class InputBottom extends StatelessWidget {
                     BoxShadow(
                         color: Theme.of(context).colorScheme.surfaceTint,
                         offset: const Offset(1, 1)),
-                    const BoxShadow(
-                        color: Color.fromARGB(255, 233, 227, 227),
-                        offset: Offset(0, 0))
                   ],
                   borderRadius: BorderRadius.circular(15),
-                  border: Border.all(color: Colors.white)),
+                  border: Border.all(
+                      color: context.watch<HomeProvider>().themeMode ==
+                              ThemeMode.light
+                          ? Colors.white
+                          : Colors.black)),
               child: TextFormField(
                 expands: false,
                 onTap: () {

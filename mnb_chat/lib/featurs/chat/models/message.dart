@@ -2,13 +2,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MessageModel {
-  int timeForSend;
   double imageHeight;
   double imageWidth;
-  final String nameOfImage;
-  bool isLonding;
-  double progressDownloading;
-  bool isDownloded;
   String? senderPath;
   String? reciverPath;
   final String fromName;
@@ -25,13 +20,8 @@ class MessageModel {
   bool isReseved;
 
   MessageModel({
-    this.timeForSend = 0,
     this.imageHeight = 0,
     this.imageWidth = 0,
-    this.nameOfImage = '',
-    this.progressDownloading = 0,
-    this.isLonding = false,
-    this.isDownloded = false,
     this.senderPath,
     this.reciverPath,
     required this.fromName,
@@ -50,13 +40,8 @@ class MessageModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'timeForSend': timeForSend,
       'imageHeight': imageHeight,
       'imageWidth': imageWidth,
-      'nameOfImage': nameOfImage,
-      'isLonding': isLonding,
-      'progressDownloading': progressDownloading,
-      'isDownloded': isDownloded,
       'senderPath': senderPath,
       'reciverPath': reciverPath,
       'fromName': fromName,
@@ -76,13 +61,8 @@ class MessageModel {
 
   factory MessageModel.fromMap(Map<String, dynamic> map) {
     return MessageModel(
-      timeForSend: map['timeForSend'] ?? 0,
       imageHeight: map['imageHeight'] as double,
       imageWidth: map['imageWidth'] as double,
-      nameOfImage: map['nameOfImage'] as String,
-      isLonding: map['isLonding'] ?? false,
-      progressDownloading: map['progressDownloading'] ?? 0,
-      isDownloded: map['isDownloded'] as bool,
       senderPath:
           map['senderPath'] != null ? map['senderPath'] as String : null,
       reciverPath:
