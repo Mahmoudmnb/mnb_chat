@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/constant.dart';
 import '../../../auth/models/user_model.dart';
@@ -23,15 +24,19 @@ class _ChatePageState extends State<ChatePage> {
   double deviceHight = 0;
   late ChatProvider readContext;
   late ChatProvider watchContext;
-
   @override
-  void initState() {
+  initState() {
     chatId = widget.chatId;
     friend = widget.friend;
     if (context.read<ChatProvider>().isConvertedMode) {
       context.read<ChatProvider>().sendConvertedMessage(chatId);
     }
     super.initState();
+  }
+
+  Future<double> getHeightOfKeyBoard() async {
+    SharedPreferences db = await SharedPreferences.getInstance();
+    return db.getDouble('heightOfKeyBoard')!;
   }
 
   @override
@@ -56,7 +61,7 @@ class _ChatePageState extends State<ChatePage> {
         child: Scaffold(
             backgroundColor: Theme.of(context).colorScheme.background,
             bottomNavigationBar: watchContext.showImojiPicker
-                ? const EmojiPickerBuilder()
+                ? EmojiPickerBuilder(h: Constant.heightOfKeyboard)
                 : const SizedBox.shrink(),
             appBar: watchContext.isMainAppBar
                 ? mainAppBar(friend.name)
@@ -145,7 +150,7 @@ class _ChatePageState extends State<ChatePage> {
         leadingWidth: deviceWidth * 0.1,
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () async {},
               icon: Icon(
                 Icons.phone,
                 color: Theme.of(context).colorScheme.error,

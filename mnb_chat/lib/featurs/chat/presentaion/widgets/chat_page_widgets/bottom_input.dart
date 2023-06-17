@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import '../../../../auth/models/user_model.dart';
 import '../../providers/chat_provider.dart';
 
-
 class InputBottom extends StatelessWidget {
   final String chatId;
   final UserModel freind;

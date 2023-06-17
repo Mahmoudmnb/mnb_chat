@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,7 +14,11 @@ import '../../models/user_model.dart';
 class AuthCard extends StatelessWidget {
   TextEditingController nameCon = TextEditingController();
   TextEditingController numberCon = TextEditingController();
-  AuthCard({super.key});
+  Future<void> Function() fun;
+  AuthCard({
+    Key? key,
+    required this.fun,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +42,10 @@ class AuthCard extends StatelessWidget {
           const Text('UserName'),
           const SizedBox(height: 10),
           TextFormField(
-            keyboardType: TextInputType.name,
+            onChanged: (value) async {
+              fun();
+            },
+            // keyboardType: TextInputType.name,
             controller: nameCon,
             decoration: const InputDecoration(
                 enabledBorder: OutlineInputBorder(
@@ -47,7 +55,7 @@ class AuthCard extends StatelessWidget {
           const Text('phone number'),
           const SizedBox(height: 10),
           TextFormField(
-            keyboardType: TextInputType.phone,
+            // keyboardType: TextInputType.phone,
             controller: numberCon,
             decoration: const InputDecoration(
                 enabledBorder: OutlineInputBorder(
@@ -67,7 +75,6 @@ class AuthCard extends StatelessWidget {
                         .doc(numberCon.text)
                         .get();
                 String? token = await FirebaseMessaging.instance.getToken();
-
                 if (isFound.data() == null) {
                   await FirebaseFirestore.instance
                       .collection('users')

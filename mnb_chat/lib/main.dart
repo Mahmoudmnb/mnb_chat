@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,10 @@ Future<void> main(List<String> args) async {
   Constant.localPath = await getApplicationDocumentsDirectory();
   RemoteMessage? initialMessage =
       await FirebaseMessaging.instance.getInitialMessage();
+  SharedPreferences db = await SharedPreferences.getInstance();
+  Constant.heightOfKeyboard = db.getDouble('heightOfKeyBoard') ?? 0;
+  FirebaseFirestore.instance.settings =
+      const Settings(cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(
     MultiProvider(

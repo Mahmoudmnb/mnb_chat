@@ -13,7 +13,6 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import '../../../../../core/constant.dart';
 import '../../../models/message.dart';
 
-
 class ImagePop extends StatefulWidget {
   DownloadTask? task;
   final MessageModel message;
@@ -56,7 +55,6 @@ class _ImagePopState extends State<ImagePop> {
       }
     }
     return widget.message.text == '' && !isMe
-        //! if i delete the image 
         ? const SizedBox.shrink()
         : GestureDetector(
             onTap: () {
@@ -68,11 +66,10 @@ class _ImagePopState extends State<ImagePop> {
                     borderRadius: BorderRadius.circular(15)),
                 child: Stack(
                   children: [
-                    isMe
+                    isMe && File(widget.message.senderPath!).existsSync()
                         ? Container(
                             constraints: BoxConstraints(
-                                maxHeight: deviceSize.height * 0.45,
-                                maxWidth: deviceSize.width * 0.5),
+                                maxHeight: imageHeight, maxWidth: imageWidth),
                             child: Stack(children: [
                               ClipRRect(
                                   borderRadius: BorderRadius.circular(15),
@@ -186,9 +183,10 @@ class _ImagePopState extends State<ImagePop> {
   }
 
   imageOnTab(isMe) {
-    if (widget.message.reciverPath == null &&
-        widget.message.text != '' &&
-        !isMe) {
+    if ((widget.message.reciverPath == null &&
+            widget.message.text != '' &&
+            !isMe) ||
+        !File(widget.message.senderPath!).isAbsolute) {
       if (widget.task == null) {
         downloadImage(widget.message);
       } else if (widget.task!.status.value == DownloadStatus.downloading) {

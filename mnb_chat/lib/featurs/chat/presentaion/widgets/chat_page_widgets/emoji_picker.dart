@@ -1,12 +1,16 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/chat_provider.dart';
 
-
 class EmojiPickerBuilder extends StatelessWidget {
-  const EmojiPickerBuilder({super.key});
+  final double h;
+  const EmojiPickerBuilder({
+    Key? key,
+    required this.h,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +18,7 @@ class EmojiPickerBuilder extends StatelessWidget {
         (MediaQuery.of(context).padding.top +
             MediaQuery.of(context).padding.bottom);
     return SizedBox(
-      height: deviceHight * 0.413,
+      height: h,
       child: EmojiPicker(
         textEditingController: context.watch<ChatProvider>().controller,
         config: Config(

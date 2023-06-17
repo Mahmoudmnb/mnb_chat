@@ -4,14 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:mnb_chat/featurs/chat/presentaion/widgets/home_page_widgets/drawer.dart';
-import 'package:mnb_chat/featurs/chat/presentaion/widgets/home_page_widgets/freind_tile.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
+
+import '../widgets/home_page_widgets/home_page_widgets.dart';
 
 import '../../../../core/constant.dart';
 import '../../../auth/models/user_model.dart';
 import '../providers/chat_provider.dart';
-
 import 'chat_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -35,9 +35,18 @@ class _HomePageState extends State<HomePage>
   }
 
   @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Size deviceSize = MediaQuery.of(context).size;
-    var data = FirebaseFirestore.instance
+    double deviceHeight = MediaQuery.of(context).size.height -
+        (MediaQuery.of(context).padding.top +
+            MediaQuery.of(context).padding.bottom);
+    Stream<QuerySnapshot<Map<String, dynamic>>> data = FirebaseFirestore
+        .instance
         .collection('users')
         .doc(Constant.currentUsre.phoneNamber)
         .collection('friends')
@@ -50,7 +59,9 @@ class _HomePageState extends State<HomePage>
         'MNB CHAT',
         style: TextStyle(color: Theme.of(context).textTheme.titleLarge!.color),
       ),
-      actions: [IconButton(onPressed: () {}, icon: const Icon(Icons.search))],
+      actions: [
+        IconButton(onPressed: () async {}, icon: const Icon(Icons.search))
+      ],
     );
     var alternativeAppBar = AppBar(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -71,95 +82,27 @@ class _HomePageState extends State<HomePage>
             ? mainAppBar
             : alternativeAppBar,
         body: TabBarView(controller: tabController, children: [
-          Center(
-            child: PageView(children: [
-              StreamBuilder(
-                  stream: data,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return ListView.builder(
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 10, left: 10, right: 10),
-                              child: FriendTile(
-                                  snapshot: snapshot,
-                                  index: index,
-                                  currentFriendNum: currentFriendNum));
-                        },
-                      );
-                    } else {
-                      return const Text('please  wait');
-                    }
-                  }),
-            ]),
-          ),
-          const Center(
-            child: Text('hiifdf'),
-          ),
-          const Center(
-            child: Text('hiifdf'),
-          )
+          FriendList(
+              deviceHeight: deviceHeight,
+              data: data,
+              currentFriendNum: currentFriendNum),
+          ContactList(currentFriendNum: currentFriendNum),
+          const Center()
         ]),
         bottomSheet: Container(
-          height: 50,
+          height: deviceHeight * 0.1,
+          alignment: Alignment.center,
           width: double.infinity,
-          color: Colors.purple[200],
-          child: TabBar(controller: tabController, tabs: const [
-            Text('data'),
-            Text('fdlkjfdlkf'),
-            Text('fdlkjfdlkf')
-          ]),
+          color: Theme.of(context).colorScheme.surface,
+          child: TabBar(
+              indicatorColor: Theme.of(context).colorScheme.error,
+              controller: tabController,
+              tabs: [
+                buildTabsIcon('Chats'),
+                buildTabsIcon('Contacts'),
+                buildTabsIcon('profile'),
+              ]),
         ),
-        floatingActionButton: FloatingActionButton(
-            child: const Icon(Icons.add),
-            onPressed: () {
-              showModalBottomSheet(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15))),
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                context: context,
-                builder: (ctx) {
-                  return StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('users')
-                        .where('number',
-                            isNotEqualTo: Constant.currentUsre.phoneNamber)
-                        .snapshots(),
-                    builder: (context, snapshot) => snapshot.hasData
-                        ? ListView.builder(
-                            itemCount: snapshot.data?.docs.length,
-                            itemBuilder: (context, index) => ListTile(
-                              title: Text(
-                                  snapshot.data!.docs[index].data()['name']),
-                              onTap: () async {
-                                UserModel friend = UserModel.fromJson(
-                                    snapshot.data!.docs[index].data());
-                                context.read<ChatProvider>().friend = friend;
-                                String chatId = await context
-                                    .read<ChatProvider>()
-                                    .createChat();
-                                currentFriendNum = friend.phoneNamber;
-                                Navigator.of(context)
-                                    .push(MaterialPageRoute(
-                                      builder: (context) => ChatePage(
-                                          chatId: chatId,
-                                          friend: UserModel.fromJson(snapshot
-                                              .data!.docs[index]
-                                              .data())),
-                                    ))
-                                    .then((value) => currentFriendNum = '');
-                              },
-                            ),
-                          )
-                        : const Text('Please wait'),
-                  );
-                },
-              );
-            }),
         drawer: const HomePageDrawer());
   }
 
@@ -191,7 +134,8 @@ class _HomePageState extends State<HomePage>
           }
         },
       );
-      if (message.data['senderNum'] != currentFriendNum) {
+      if (message.data['senderNum'] != currentFriendNum &&
+          message.data['token'] != Constant.currentUsre.token) {
         BigTextStyleInformation bigTextStyleInformation =
             BigTextStyleInformation(
           message.notification!.body.toString(),
@@ -244,5 +188,29 @@ class _HomePageState extends State<HomePage>
       sound: true,
     );
     print('User granted permission: ${settings.authorizationStatus}');
+  }
+
+  Widget buildTabsIcon(String text) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 10),
+        Icon(
+          text == 'Contacts'
+              ? MdiIcons.accountBox
+              : text == 'Chats'
+                  ? MdiIcons.chat
+                  : MdiIcons.faceManProfile,
+          size: MediaQuery.of(context).size.width * 0.06,
+          color: Theme.of(context).colorScheme.error,
+        ),
+        Text(
+          text,
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).textTheme.titleLarge!.color),
+        )
+      ],
+    );
   }
 }

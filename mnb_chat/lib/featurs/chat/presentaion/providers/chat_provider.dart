@@ -406,7 +406,8 @@ class ChatProvider extends ChangeNotifier {
               'status': 'done',
               'senderNum': senderNum,
               'chatId': chatId,
-              'friend': localFreind
+              'friend': localFreind,
+              'token':token
             },
             "to": token,
           },
