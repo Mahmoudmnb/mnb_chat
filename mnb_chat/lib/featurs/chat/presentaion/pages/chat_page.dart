@@ -47,9 +47,9 @@ class _ChatePageState extends State<ChatePage> {
 
   @override
   Widget build(BuildContext context) {
-    //* this is for getting device hight and width
     readContext = context.read<ChatProvider>();
     watchContext = context.watch<ChatProvider>();
+    //* this is for getting device hight and width
 
     deviceWidth = MediaQuery.of(context).size.width;
     deviceHight = deviceHight = MediaQuery.of(context).size.height -
@@ -150,7 +150,10 @@ class _ChatePageState extends State<ChatePage> {
         leadingWidth: deviceWidth * 0.1,
         actions: [
           IconButton(
-              onPressed: () async {},
+              onPressed: () async {
+                FocusScope.of(context)
+                    .requestFocus(context.read<ChatProvider>().focusNode);
+              },
               icon: Icon(
                 Icons.phone,
                 color: Theme.of(context).colorScheme.error,
@@ -162,7 +165,11 @@ class _ChatePageState extends State<ChatePage> {
                 color: Theme.of(context).colorScheme.error,
               )),
           PopupMenuButton(
-            icon: const Icon(Icons.more_vert),
+            color: Theme.of(context).colorScheme.surface,
+            icon: Icon(
+              Icons.more_vert,
+              color: Theme.of(context).colorScheme.error,
+            ),
             itemBuilder: (context) => [
               PopupMenuItem(
                   child: TextButton(

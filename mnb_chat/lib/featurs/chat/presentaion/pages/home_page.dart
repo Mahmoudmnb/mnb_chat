@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
-
-import '../widgets/home_page_widgets/home_page_widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/constant.dart';
 import '../../../auth/models/user_model.dart';
 import '../providers/chat_provider.dart';
+import '../providers/home_provider.dart';
+import '../widgets/home_page_widgets/home_page_widgets.dart';
+import '../widgets/home_page_widgets/profile_page.dart';
 import 'chat_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,6 +31,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     tabController = TabController(length: 3, vsync: this);
+    
     getPermision();
     initInfo();
     super.initState();
@@ -52,18 +55,35 @@ class _HomePageState extends State<HomePage>
         .collection('friends')
         .snapshots(includeMetadataChanges: true);
     var mainAppBar = AppBar(
+      centerTitle: true,
       foregroundColor: Theme.of(context).colorScheme.error,
       backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 0,
       title: Text(
         'MNB CHAT',
+        textAlign: TextAlign.center,
         style: TextStyle(color: Theme.of(context).textTheme.titleLarge!.color),
       ),
       actions: [
-        IconButton(onPressed: () async {}, icon: const Icon(Icons.search))
+        IconButton(
+            onPressed: () async {
+              SharedPreferences db = await SharedPreferences.getInstance();
+              if (context.read<HomeProvider>().themeMode == ThemeMode.light) {
+                context.read<HomeProvider>().setThemeMode = ThemeMode.dark;
+                db.setString('Theme', 'dark');
+              } else {
+                context.read<HomeProvider>().setThemeMode = ThemeMode.light;
+                db.setString('Theme', 'light');
+              }
+            },
+            icon: Icon(
+                context.watch<HomeProvider>().themeMode == ThemeMode.light
+                    ? Icons.light_mode
+                    : Icons.dark_mode))
       ],
     );
     var alternativeAppBar = AppBar(
+      centerTitle: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
       elevation: 0,
       title: Text(
@@ -77,33 +97,33 @@ class _HomePageState extends State<HomePage>
           icon: const Icon(Icons.arrow_back)),
     );
     return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.background,
-        appBar: !context.watch<ChatProvider>().isConvertedMode
-            ? mainAppBar
-            : alternativeAppBar,
-        body: TabBarView(controller: tabController, children: [
-          FriendList(
-              deviceHeight: deviceHeight,
-              data: data,
-              currentFriendNum: currentFriendNum),
-          ContactList(currentFriendNum: currentFriendNum),
-          const Center()
-        ]),
-        bottomSheet: Container(
-          height: deviceHeight * 0.1,
-          alignment: Alignment.center,
-          width: double.infinity,
-          color: Theme.of(context).colorScheme.surface,
-          child: TabBar(
-              indicatorColor: Theme.of(context).colorScheme.error,
-              controller: tabController,
-              tabs: [
-                buildTabsIcon('Chats'),
-                buildTabsIcon('Contacts'),
-                buildTabsIcon('profile'),
-              ]),
-        ),
-        drawer: const HomePageDrawer());
+      backgroundColor: Theme.of(context).colorScheme.background,
+      appBar: !context.watch<ChatProvider>().isConvertedMode
+          ? mainAppBar
+          : alternativeAppBar,
+      body: TabBarView(controller: tabController, children: [
+        FriendList(
+            deviceHeight: deviceHeight,
+            data: data,
+            currentFriendNum: currentFriendNum),
+        ContactList(currentFriendNum: currentFriendNum),
+        const ProfilePage()
+      ]),
+      bottomSheet: Container(
+        height: deviceHeight * 0.1,
+        alignment: Alignment.center,
+        width: double.infinity,
+        color: Theme.of(context).colorScheme.surface,
+        child: TabBar(
+            indicatorColor: Theme.of(context).colorScheme.error,
+            controller: tabController,
+            tabs: [
+              buildTabsIcon('Chats'),
+              buildTabsIcon('People'),
+              buildTabsIcon('profile'),
+            ]),
+      ),
+    );
   }
 
   void initInfo() {
@@ -196,8 +216,8 @@ class _HomePageState extends State<HomePage>
       children: [
         const SizedBox(height: 10),
         Icon(
-          text == 'Contacts'
-              ? MdiIcons.accountBox
+          text == 'People'
+              ? Icons.group
               : text == 'Chats'
                   ? MdiIcons.chat
                   : MdiIcons.faceManProfile,

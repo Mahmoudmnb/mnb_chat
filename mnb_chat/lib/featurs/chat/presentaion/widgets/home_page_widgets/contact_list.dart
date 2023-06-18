@@ -9,6 +9,7 @@ import '../../pages/chat_page.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/home_provider.dart';
 
+// ignore: must_be_immutable
 class ContactList extends StatelessWidget {
   String currentFriendNum;
   ContactList({

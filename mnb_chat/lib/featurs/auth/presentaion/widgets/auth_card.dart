@@ -1,14 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../../core/constant.dart';
-import '../../../chat/presentaion/pages/home_page.dart';
-import '../../models/user_model.dart';
+import 'package:mnb_chat/featurs/auth/presentaion/provider/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class AuthCard extends StatelessWidget {
@@ -68,39 +62,40 @@ class AuthCard extends StatelessWidget {
                     Size(MediaQuery.of(context).size.width * 0.8, 30)),
                 backgroundColor: const MaterialStatePropertyAll(Colors.amber)),
             onPressed: () async {
-              if (nameCon.text.isNotEmpty && numberCon.text.isNotEmpty) {
-                DocumentSnapshot<Map<String, dynamic>>? isFound =
-                    await FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(numberCon.text)
-                        .get();
-                String? token = await FirebaseMessaging.instance.getToken();
-                if (isFound.data() == null) {
-                  await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(numberCon.text)
-                      .set({
-                    'name': nameCon.text,
-                    'number': numberCon.text,
-                    'token': token
-                  });
-                }
-                Constant.currentUsre = UserModel(
-                    name: nameCon.text,
-                    phoneNamber: numberCon.text,
-                    token: token!);
-                SharedPreferences db = await SharedPreferences.getInstance();
-                db.setString(
-                    'currentUser', json.encode(Constant.currentUsre.toJson()));
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => HomePage(
-                    user: UserModel(
-                        token: token,
-                        name: nameCon.text,
-                        phoneNamber: numberCon.text),
-                  ),
-                ));
-              }
+              context.read<AuthProvider>().signIn();
+              // if (nameCon.text.isNotEmpty && numberCon.text.isNotEmpty) {
+              //   DocumentSnapshot<Map<String, dynamic>>? isFound =
+              //       await FirebaseFirestore.instance
+              //           .collection('users')
+              //           .doc(numberCon.text)
+              //           .get();
+              //   String? token = await FirebaseMessaging.instance.getToken();
+              //   if (isFound.data() == null) {
+              //     await FirebaseFirestore.instance
+              //         .collection('users')
+              //         .doc(numberCon.text)
+              //         .set({
+              //       'name': nameCon.text,
+              //       'number': numberCon.text,
+              //       'token': token
+              //     });
+              //   }
+              //   Constant.currentUsre = UserModel(
+              //       name: nameCon.text,
+              //       phoneNamber: numberCon.text,
+              //       token: token!);
+              //   SharedPreferences db = await SharedPreferences.getInstance();
+              //   db.setString(
+              //       'currentUser', json.encode(Constant.currentUsre.toJson()));
+              //   Navigator.of(context).pushReplacement(MaterialPageRoute(
+              //     builder: (context) => HomePage(
+              //       user: UserModel(
+              //           token: token,
+              //           name: nameCon.text,
+              //           phoneNamber: numberCon.text),
+              //     ),
+              //   ));
+              // }
             },
             child: const Text(
               'send code',

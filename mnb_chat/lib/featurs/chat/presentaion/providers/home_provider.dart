@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
 class HomeProvider extends ChangeNotifier {
+  HomeProvider(this._themeMode);
   //!             ///////////////////////////////   variables   ////////////////////////////////////////////////
 
   //* this is for light theme and dark them
-  static ThemeMode _themeMode = ThemeMode.light;
+  ThemeMode _themeMode ;
   get themeMode => _themeMode;
   set setThemeMode(value) {
     _themeMode = value;

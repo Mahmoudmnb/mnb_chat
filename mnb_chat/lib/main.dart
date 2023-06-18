@@ -22,6 +22,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
 }
 
+ThemeMode? themeMode;
 Future<void> main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -32,6 +33,9 @@ Future<void> main(List<String> args) async {
       await FirebaseMessaging.instance.getInitialMessage();
   SharedPreferences db = await SharedPreferences.getInstance();
   Constant.heightOfKeyboard = db.getDouble('heightOfKeyBoard') ?? 0;
+  var s = db.getString('Theme');
+
+  themeMode = s == 'light' ? ThemeMode.light : ThemeMode.dark;
   FirebaseFirestore.instance.settings =
       const Settings(cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -45,7 +49,7 @@ Future<void> main(List<String> args) async {
           create: (context) => ChatProvider(),
         ),
         ChangeNotifierProvider(
-          create: (context) => HomeProvider(),
+          create: (context) => HomeProvider(themeMode ?? ThemeMode.light),
         )
       ],
       child: const MyApp(),

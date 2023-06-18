@@ -407,7 +407,7 @@ class ChatProvider extends ChangeNotifier {
               'senderNum': senderNum,
               'chatId': chatId,
               'friend': localFreind,
-              'token':token
+              'token': token
             },
             "to": token,
           },
@@ -573,7 +573,8 @@ class ChatProvider extends ChangeNotifier {
 
   //* when click on edit icon in alternative appBar to edit a message
   Future<void> editOnTab(BuildContext context) async {
-    //* open keyboard on edit
+    //! open keyboard on edit
+    FocusScope.of(context).requestFocus(focusNode);
     _editMode = true;
     setMainAppBar = true;
     controller.value = TextEditingValue(
@@ -581,7 +582,6 @@ class ChatProvider extends ChangeNotifier {
       selection: TextSelection.collapsed(offset: selectedMessage!.text.length),
     );
     setInputText = controller.text;
-    FocusScope.of(context).requestFocus(focusNode);
   }
 
   //* when click on copy message in alternative appBar to copy messages

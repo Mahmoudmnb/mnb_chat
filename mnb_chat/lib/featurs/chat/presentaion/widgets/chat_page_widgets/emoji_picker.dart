@@ -14,7 +14,6 @@ class EmojiPickerBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double deviceHight = MediaQuery.of(context).size.height -
         (MediaQuery.of(context).padding.top +
             MediaQuery.of(context).padding.bottom);
     return SizedBox(
