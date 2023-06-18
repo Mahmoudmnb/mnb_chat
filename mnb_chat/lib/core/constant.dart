@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import '../featurs/auth/models/user_model.dart';
 
 class Constant {
+  static Duration duration = const Duration(milliseconds: 500);
   static UserModel currentUsre =
       UserModel(token: '', name: '', phoneNamber: '');
   static Directory? localPath;
- static double heightOfKeyboard = 0;
+  static double heightOfKeyboard = 0;
   //! chat page colors
   static Color chatBackgroundColor = const Color.fromRGBO(221, 231, 227, 1);
   static Color appBarColor = const Color.fromRGBO(248, 248, 248, 1);

@@ -10,9 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/constant.dart';
 
+import 'featurs/Auth/presentation/pages/auth_page.dart';
+import 'featurs/Auth/presentation/provider/auth_provider.dart';
 import 'featurs/auth/models/user_model.dart';
-import 'featurs/auth/presentaion/pages/auth_page.dart';
-import 'featurs/auth/presentaion/provider/auth_provider.dart';
 import 'featurs/chat/presentaion/pages/home_page.dart';
 import 'featurs/chat/presentaion/providers/chat_provider.dart';
 import 'featurs/chat/presentaion/providers/home_provider.dart';
@@ -82,7 +82,7 @@ class _MyAppState extends State<MyApp> {
               Constant.currentUsre = currentUser;
               return HomePage(user: currentUser);
             } else {
-              return const AuthPage();
+              return AuthPage();
             }
           }
           return const Center(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mnb_chat/core/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../auth/presentaion/pages/auth_page.dart';
+import '../../../../Auth/presentation/pages/auth_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -124,7 +124,7 @@ class ProfilePage extends StatelessWidget {
                             await SharedPreferences.getInstance();
                         db.remove('currentUser');
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => const AuthPage(),
+                          builder: (context) => AuthPage(),
                         ));
                       },
                       shape: OutlineInputBorder(
