@@ -39,6 +39,8 @@ class AlternativeBottomInput extends StatelessWidget {
                   },
                   label: const Text(
                     'Reply',
+overflow: TextOverflow.ellipsis,
+
                     style: TextStyle(fontSize: 20),
                   ),
                   icon: const Icon(Icons.arrow_back))
@@ -51,6 +53,8 @@ class AlternativeBottomInput extends StatelessWidget {
                 children: [
                   Text(
                     'Convert',
+overflow: TextOverflow.ellipsis,
+
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(width: 5),

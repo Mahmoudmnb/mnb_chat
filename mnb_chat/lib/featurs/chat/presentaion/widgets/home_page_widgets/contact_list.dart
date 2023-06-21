@@ -28,7 +28,7 @@ class ContactList extends StatelessWidget {
             UserModel.fromJson(snapshot.data!.docs[index].data());
         context.read<ChatProvider>().friend = friend;
         String chatId = await context.read<ChatProvider>().createChat();
-        currentFriendNum = friend.phoneNamber;
+        currentFriendNum = friend.email;
         Navigator.of(context)
             .push(MaterialPageRoute(
           builder: (context) => ChatePage(
@@ -45,7 +45,7 @@ class ContactList extends StatelessWidget {
     return StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('users')
-            .where('number', isNotEqualTo: Constant.currentUsre.phoneNamber)
+            .where('email', isNotEqualTo: Constant.currentUsre.email)
             .snapshots(),
         builder: (context, snapshot) => snapshot.hasData
             ? ListView.builder(
@@ -65,7 +65,7 @@ class ContactList extends StatelessWidget {
                                     snapshot.data!.docs[index].data()['chatId'])
                                 .collection('msg')
                                 .where('to',
-                                    isEqualTo: Constant.currentUsre.phoneNamber)
+                                    isEqualTo: Constant.currentUsre.email)
                                 .where('isReseved', isEqualTo: false)
                                 .snapshots(),
                             builder: (context, snapshot1) {
@@ -81,7 +81,10 @@ class ContactList extends StatelessWidget {
                                           borderRadius:
                                               BorderRadius.circular(15)),
                                       child: Text((snapshot1.data?.docs.length)
-                                          .toString()),
+                                          .toString(),
+overflow: TextOverflow.ellipsis,
+                                          
+                                          ),
                                     )
                                   : const SizedBox.shrink();
                             },
@@ -99,6 +102,8 @@ class ContactList extends StatelessWidget {
                         : Colors.white,
                     title: Text(
                       snapshot.data!.docs[index].data()['name'],
+overflow: TextOverflow.ellipsis,
+
                       style: TextStyle(
                           color: Theme.of(context).textTheme.titleLarge!.color,
                           fontWeight: FontWeight.bold,
@@ -107,6 +112,9 @@ class ContactList extends StatelessWidget {
                   ),
                 ),
               )
-            : const Text('please wait'));
+            : const Text('please wait',
+overflow: TextOverflow.ellipsis,
+            
+            ));
   }
 }

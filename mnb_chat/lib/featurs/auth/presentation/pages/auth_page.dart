@@ -15,8 +15,11 @@ class AuthPage extends StatelessWidget {
     ToastContext toastContext = ToastContext();
     toastContext.init(context);
     final deviceSize = MediaQuery.of(context).size;
+    double heightOfDevice = MediaQuery.of(context).size.height -
+        (MediaQuery.of(context).padding.top +
+            MediaQuery.of(context).padding.bottom);
     return Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).colorScheme.onBackground,
         body: GestureDetector(
           onTap: () {
             FocusScope.of(context).unfocus();
@@ -25,9 +28,19 @@ class AuthPage extends StatelessWidget {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  SizedBox(height: deviceSize.height * 0.16),
+                  SizedBox(
+                    height: heightOfDevice * 0.16,
+                    child: Center(
+                      child: Text(
+                        'MNB CHAT',
+                        style: TextStyle(
+                            fontSize: deviceSize.width * 0.1,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ),
                   Container(
-                    height: deviceSize.height * 0.802,
+                    height: heightOfDevice * 0.84,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: const BoxDecoration(
                         color: Colors.white70,
@@ -38,7 +51,12 @@ class AuthPage extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 10),
+                          HideItem(
+                              maxHight: context.watch<AuthProvider>().isSignIn
+                                  ? heightOfDevice * 0.08
+                                  : heightOfDevice * 0.02,
+                              visabl: true,
+                              child: const SizedBox.shrink()),
                           const Padding(
                             padding: EdgeInsets.symmetric(horizontal: 20),
                             child: SwitchBetweenTwoText(
@@ -57,7 +75,7 @@ class AuthPage extends StatelessWidget {
                                 textStyle:
                                     TextStyle(color: Colors.grey.shade600),
                               )),
-                          const SizedBox(height: 10),
+                          SizedBox(height: heightOfDevice * 0.02),
                           AuthForm(formKey: formKey),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -71,16 +89,21 @@ class AuthPage extends StatelessWidget {
                                     maxHight: 35,
                                     child: TextButton(
                                       onPressed: () {
-                                        showResetDialog(context);
+                                        // showResetDialog(context);
+                                        context
+                                            .read<AuthProvider>()
+                                            .changePassword();
                                       },
                                       child: const Text('Forgot password ?',
+                                          overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
+                                              color: Colors.black,
                                               fontWeight: FontWeight.bold)),
                                     ),
                                   ))
                             ],
                           ),
-                          const SizedBox(height: 15),
+                          SizedBox(height: heightOfDevice * 0.05),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -89,7 +112,7 @@ class AuthPage extends StatelessWidget {
                                   InkWell(
                                     onTap: context
                                             .read<AuthProvider>()
-                                            .isButtonLoding
+                                            .isButtonLoading
                                         ? null
                                         : () => logicButton(context),
                                     child: Container(
@@ -97,13 +120,14 @@ class AuthPage extends StatelessWidget {
                                         width: deviceSize.width * 0.8,
                                         height: 50,
                                         decoration: BoxDecoration(
-                                            color:
-                                                Theme.of(context).primaryColor,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onBackground,
                                             borderRadius:
                                                 BorderRadius.circular(15)),
                                         child: !context
                                                 .read<AuthProvider>()
-                                                .isButtonLoding
+                                                .isButtonLoading
                                             ? const SwitchBetweenTwoText(
                                                 firstText: 'SIGN UP',
                                                 secondText: 'LOG IN',
@@ -119,22 +143,23 @@ class AuthPage extends StatelessWidget {
                                               )),
                                   ),
                                   const SizedBox(height: 15),
-                                  HideItem(
-                                    visabl:
-                                        context.watch<AuthProvider>().isSignIn,
-                                    maxHight: 15,
-                                    child: Text(
-                                      'or connect with',
-                                      style: TextStyle(
-                                          color: Colors.grey.shade600),
-                                    ),
-                                  ),
-                                  HideItem(
-                                      visabl: context
-                                          .watch<AuthProvider>()
-                                          .isSignIn,
-                                      maxHight: 100,
-                                      child: const AlternativeSignInMethod()),
+                                  // HideItem(
+                                  //   visabl:
+                                  //       context.watch<AuthProvider>().isSignIn,
+                                  //   maxHight: 15,
+                                  //   child: Text(
+                                  //     'or connect with',
+                                  //     overflow: TextOverflow.ellipsis,
+                                  //     style: TextStyle(
+                                  //         color: Colors.grey.shade600),
+                                  //   ),
+                                  // ),
+                                  // HideItem(
+                                  //     visabl: context
+                                  //         .watch<AuthProvider>()
+                                  //         .isSignIn,
+                                  //     maxHight: 100,
+                                  //     child: const AlternativeSignInMethod()),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,
@@ -151,13 +176,13 @@ class AuthPage extends StatelessWidget {
                                               .read<AuthProvider>()
                                               .changeSignInOrSignUp();
                                         },
-                                        child: SwitchBetweenTwoText(
+                                        child: const SwitchBetweenTwoText(
                                           firstText: 'sign in',
                                           secondText: 'sign up',
                                           textStyle: TextStyle(
                                               fontSize: 15,
-                                              color: Theme.of(context)
-                                                  .primaryColor),
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold),
                                         ),
                                       )
                                     ],
@@ -178,45 +203,46 @@ class AuthPage extends StatelessWidget {
   }
 
   bool isLoding = false;
-  Future<dynamic> showResetDialog(BuildContext context) {
-    controller = TextEditingController();
-    return showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(
-          'Reset password',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor),
-        ),
-        content: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(5),
-            height: 50,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15),
-                border: Border.all(color: Theme.of(context).primaryColor)),
-            child: TextField(
-              keyboardType: TextInputType.emailAddress,
-              controller: controller,
-              decoration: const InputDecoration.collapsed(hintText: 'email'),
-            )),
-        alignment: Alignment.center,
-        actions: [
-          Center(
-              child: StatefulBuilder(
-            builder: (context, setState) => TextButton(
-                onPressed: () async {},
-                child: !isLoding
-                    ? const Text(
-                        'Reset',
-                        style: TextStyle(fontSize: 20),
-                      )
-                    : const CircularProgressIndicator()),
-          ))
-        ],
-      ),
-    );
-  }
+  // Future<dynamic> showResetDialog(BuildContext context) {
+  //   controller = TextEditingController();
+  //   return showDialog(
+  //     context: context,
+  //     builder: (ctx) => AlertDialog(
+  //       title: Text(
+  //         'Reset password',
+  //         textAlign: TextAlign.center,
+  //         style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor),
+  //       ),
+  //       content: Container(
+  //           alignment: Alignment.center,
+  //           padding: const EdgeInsets.all(5),
+  //           height: 50,
+  //           decoration: BoxDecoration(
+  //               borderRadius: BorderRadius.circular(15),
+  //               border: Border.all(color: Theme.of(context).primaryColor)),
+  //           child: TextField(
+  //             keyboardType: TextInputType.emailAddress,
+  //             controller: controller,
+  //             decoration: const InputDecoration.collapsed(hintText: 'email'),
+  //           )),
+  //       alignment: Alignment.center,
+  //       actions: [
+  //         Center(
+  //             child: StatefulBuilder(
+  //           builder: (context, setState) => TextButton(
+  //               onPressed: () async {},
+  //               child: !isLoding
+  //                   ? const Text(
+  //                       'Reset',
+  //                       overflow: TextOverflow.ellipsis,
+  //                       style: TextStyle(fontSize: 20),
+  //                     )
+  //                   : const CircularProgressIndicator()),
+  //         ))
+  //       ],
+  //     ),
+  //   );
+  // }
 
   logicButton(BuildContext context) async {
     bool isvalidete = formKey.currentState!.validate();
@@ -225,11 +251,10 @@ class AuthPage extends StatelessWidget {
       context.read<AuthProvider>().changeValidate(isvalidete);
       formKey.currentState!.save();
       if (context.read<AuthProvider>().isSignIn) {
-        // await context.read<AuthProvider>().signIn();
+        await context.read<AuthProvider>().signIn(context);
       } else {
-        await context.read<AuthProvider>().signUp();
+        await context.read<AuthProvider>().signUp(context);
       }
-
       context.read<AuthProvider>().setButtonLoding(false);
     }
   }

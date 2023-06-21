@@ -59,6 +59,8 @@ class MessagePop extends StatelessWidget {
         children: [
           Text(
             message.text,
+overflow: TextOverflow.ellipsis,
+
             style: TextStyle(
                 fontSize: deviceSize.width * 0.05,
                 color: Theme.of(context).textTheme.titleLarge!.color),
@@ -70,6 +72,8 @@ class MessagePop extends StatelessWidget {
               Text(
                 '${(message.date).toDate().hour}:${(message.date).toDate().minute}',
                 textAlign: TextAlign.end,
+overflow: TextOverflow.ellipsis,
+
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onError,
                     fontSize: deviceSize.width * 0.035,

@@ -158,7 +158,7 @@ class ChatProvider extends ChangeNotifier {
       var s = await selectedMessage.get();
       if (s.data()!['deletedFrom'] == null) {
         await selectedMessage
-            .update({'deletedFrom': Constant.currentUsre.phoneNamber});
+            .update({'deletedFrom': Constant.currentUsre.email});
       } else {
         await selectedMessage.delete();
         if (element.type == 'Image') {
@@ -179,6 +179,8 @@ class ChatProvider extends ChangeNotifier {
           builder: (context) => AlertDialog(
                 title: const Text(
                   'Delete message',
+overflow: TextOverflow.ellipsis,
+
                   style: TextStyle(fontSize: 25),
                 ),
                 content: SizedBox(
@@ -187,6 +189,8 @@ class ChatProvider extends ChangeNotifier {
                     children: [
                       const Text(
                         'Do you realy want to delete this message ?',
+overflow: TextOverflow.ellipsis,
+
                         style: TextStyle(fontSize: 15),
                       ),
                       StatefulBuilder(
@@ -203,6 +207,8 @@ class ChatProvider extends ChangeNotifier {
                             ),
                             Text(
                               'delete also from ${friend!.name} ?',
+overflow: TextOverflow.ellipsis,
+
                               style: const TextStyle(fontSize: 15),
                             ),
                           ],
@@ -218,6 +224,8 @@ class ChatProvider extends ChangeNotifier {
                       },
                       child: const Text(
                         'Delete',
+overflow: TextOverflow.ellipsis,
+
                         style: TextStyle(fontSize: 20),
                       )),
                   TextButton(
@@ -226,6 +234,8 @@ class ChatProvider extends ChangeNotifier {
                       },
                       child: const Text(
                         'Cancel',
+overflow: TextOverflow.ellipsis,
+
                         style: TextStyle(fontSize: 20),
                       ))
                 ],
@@ -253,7 +263,7 @@ class ChatProvider extends ChangeNotifier {
               var s = await selectedMessage.get();
               if (s.data()!['deletedFrom'] == null) {
                 await selectedMessage
-                    .update({'deletedFrom': Constant.currentUsre.phoneNamber});
+                    .update({'deletedFrom': Constant.currentUsre.email});
               } else {
                 await selectedMessage.delete();
                 if (element.type == 'Image') {
@@ -349,14 +359,14 @@ class ChatProvider extends ChangeNotifier {
             messageId: id,
             text: controller.text,
             date: Timestamp.now(), // FieldValue.serverTimestamp(),
-            from: Constant.currentUsre.phoneNamber,
-            to: friend.phoneNamber);
+            from: Constant.currentUsre.email,
+            to: friend.email);
         cancelReplyModeOnTab();
         sendPushMessage(
             controller.text,
             Constant.currentUsre.name,
             friend.token,
-            Constant.currentUsre.phoneNamber,
+            Constant.currentUsre.email,
             chatId,
             Constant.currentUsre);
         controller.text = '';
@@ -443,8 +453,8 @@ class ChatProvider extends ChangeNotifier {
         messageId: id,
         text: '',
         date: Timestamp.now(),
-        from: Constant.currentUsre.phoneNamber,
-        to: friend!.phoneNamber);
+        from: Constant.currentUsre.email,
+        to: friend!.email);
     await FirebaseFirestore.instance
         .collection('messages')
         .doc(chatId)
@@ -468,7 +478,7 @@ class ChatProvider extends ChangeNotifier {
             .doc(id)
             .update({'isSent': true, 'text': await event.ref.getDownloadURL()});
         sendPushMessage('Image', Constant.currentUsre.name, friend!.token,
-            Constant.currentUsre.phoneNamber, chatId, friend!);
+            Constant.currentUsre.email, chatId, friend!);
       }
     });
     moveToEnd();
@@ -498,41 +508,41 @@ class ChatProvider extends ChangeNotifier {
   Future<String> createChat() async {
     var first = await FirebaseFirestore.instance
         .collection('messages')
-        .where('to', isEqualTo: Constant.currentUsre.phoneNamber)
-        .where('from', isEqualTo: friend!.phoneNamber)
+        .where('to', isEqualTo: Constant.currentUsre.email)
+        .where('from', isEqualTo: friend!.email)
         .get();
     var second = await FirebaseFirestore.instance
         .collection('messages')
-        .where('from', isEqualTo: Constant.currentUsre.phoneNamber)
-        .where('to', isEqualTo: friend!.phoneNamber)
+        .where('from', isEqualTo: Constant.currentUsre.email)
+        .where('to', isEqualTo: friend!.email)
         .get();
     if (first.docs.isEmpty && second.docs.isEmpty) {
       var chatId = await FirebaseFirestore.instance.collection('messages').add({
         'fromToken': Constant.currentUsre.token,
         'toToken': friend!.token,
-        'from': Constant.currentUsre.phoneNamber,
+        'from': Constant.currentUsre.email,
         'fromName': Constant.currentUsre.name,
         'toName': friend!.name,
-        'to': friend!.phoneNamber
+        'to': friend!.email
       });
       FirebaseFirestore.instance
           .collection('users')
-          .doc(Constant.currentUsre.phoneNamber)
+          .doc(Constant.currentUsre.email)
           .collection('friends')
-          .doc(friend!.phoneNamber)
+          .doc(friend!.email)
           .set({
-        'to': friend!.phoneNamber,
+        'to': friend!.email,
         'toToken': friend!.token,
         'toName': friend!.name,
         'chatId': chatId.id
       });
       FirebaseFirestore.instance
           .collection('users')
-          .doc(friend!.phoneNamber)
+          .doc(friend!.email)
           .collection('friends')
-          .doc(Constant.currentUsre.phoneNamber)
+          .doc(Constant.currentUsre.email)
           .set({
-        'to': Constant.currentUsre.phoneNamber,
+        'to': Constant.currentUsre.email,
         'toToken': Constant.currentUsre.token,
         'toName': Constant.currentUsre.name,
         'chatId': chatId.id
@@ -547,22 +557,22 @@ class ChatProvider extends ChangeNotifier {
       }
       FirebaseFirestore.instance
           .collection('users')
-          .doc(Constant.currentUsre.phoneNamber)
+          .doc(Constant.currentUsre.email)
           .collection('friends')
-          .doc(friend!.phoneNamber)
+          .doc(friend!.email)
           .set({
-        'to': friend!.phoneNamber,
+        'to': friend!.email,
         'toToken': friend!.token,
         'toName': friend!.name,
         'chatId': chatId,
       });
       FirebaseFirestore.instance
           .collection('users')
-          .doc(friend!.phoneNamber)
+          .doc(friend!.email)
           .collection('friends')
-          .doc(Constant.currentUsre.phoneNamber)
+          .doc(Constant.currentUsre.email)
           .set({
-        'to': Constant.currentUsre.phoneNamber,
+        'to': Constant.currentUsre.email,
         'toToken': Constant.currentUsre.token,
         'toName': Constant.currentUsre.name,
         'chatId': chatId

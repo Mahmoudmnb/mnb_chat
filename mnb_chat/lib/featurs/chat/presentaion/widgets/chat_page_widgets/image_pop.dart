@@ -42,7 +42,7 @@ class _ImagePopState extends State<ImagePop> {
   @override
   Widget build(BuildContext context) {
     getImageSize(widget.message);
-    bool isMe = widget.message.from == Constant.currentUsre.phoneNamber;
+    bool isMe = widget.message.from == Constant.currentUsre.email;
     Size deviceSize = MediaQuery.of(context).size;
     if (!isMe) {
       if (widget.message.messageId != '') {
@@ -159,6 +159,8 @@ class _ImagePopState extends State<ImagePop> {
                           children: [
                             Text(
                               '${(widget.message.date).toDate().hour}:${(widget.message.date).toDate().minute}',
+overflow: TextOverflow.ellipsis,
+                            
                               style: TextStyle(
                                   fontSize: deviceSize.width * 0.04,
                                   fontWeight: FontWeight.bold),
@@ -213,7 +215,7 @@ class _ImagePopState extends State<ImagePop> {
   }
 
   downloadImage(MessageModel message) async {
-    bool isMe = message.from == Constant.currentUsre.phoneNamber;
+    bool isMe = message.from == Constant.currentUsre.email;
     if (!isMe && message.reciverPath == null && message.text != '') {
       widget.task = await downloadManager.addDownload(
           message.text, '${Constant.localPath!.path}${message.messageId}.jpg');

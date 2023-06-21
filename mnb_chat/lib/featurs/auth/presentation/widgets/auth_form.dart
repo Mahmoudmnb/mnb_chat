@@ -16,9 +16,26 @@ class _AuthFormState extends State<AuthForm> {
   String name = '';
   String password = '';
   String email = '';
-  TextEditingController nameCon = TextEditingController();
-  TextEditingController passwordCon = TextEditingController();
-  TextEditingController emailCon = TextEditingController();
+  late TextEditingController nameCon;
+  late TextEditingController passwordCon;
+  late TextEditingController emailCon;
+  @override
+  void initState() {
+    nameCon = TextEditingController();
+    emailCon = TextEditingController();
+    passwordCon = TextEditingController();
+    context.read<AuthProvider>().colorOfEmailValidateIcon = Colors.black;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    nameCon.dispose();
+    passwordCon.dispose();
+    emailCon.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -27,13 +44,14 @@ class _AuthFormState extends State<AuthForm> {
           key: widget.formKey,
           child: Column(
             children: [
-              const SizedBox(height: 15),
+              const SizedBox(height: 5),
               HideItem(
                 visabl: !context.watch<AuthProvider>().isSignIn,
                 maxHight: 78,
-                child: _createTextFormField('E-mail adress', context),
+                child: _createTextFormField('User name', context),
               ),
-              _createTextFormField('User name', context),
+              const SizedBox(height: 15),
+              _createTextFormField('E-mail adress', context),
               const SizedBox(height: 15),
               _createTextFormField('Password', context),
             ],
@@ -57,7 +75,14 @@ class _AuthFormState extends State<AuthForm> {
           label == 'Password' && !Provider.of<AuthProvider>(context).visibl!
               ? true
               : false,
+      cursorColor: Colors.black,
       decoration: InputDecoration(
+        errorStyle: const TextStyle(color: Colors.red),
+        focusedErrorBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.red)),
+        errorBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.red)),
+        labelStyle: const TextStyle(color: Colors.black),
         suffixIcon: label == 'Password'
             ? IconButton(
                 icon: Icon(Provider.of<AuthProvider>(context).visibl!
@@ -68,32 +93,43 @@ class _AuthFormState extends State<AuthForm> {
                       .visableChangeSatate();
                 })
             : label == 'E-mail adress'
-                ? const Icon(Icons.check_circle_outline)
+                ? Icon(
+                    Icons.check_circle_outline,
+                    color:
+                        context.watch<AuthProvider>().colorOfEmailValidateIcon,
+                  )
                 : null,
-        suffixIconColor: Theme.of(context).primaryColor,
+        suffixIconColor: Colors.black,
+        focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.black)),
         enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Colors.grey.shade500)),
-        label: Text(label),
+        label: Text(
+          label,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       validator: (value) {
         if (label == 'E-mail adress') {
-          if (!context.read<AuthProvider>().isSignIn &&
-              (value!.isEmpty ||
-                  !value.contains('@') ||
-                  !value.contains('.com'))) {
+          if ((value!.isEmpty ||
+              !value.contains('@') ||
+              !value.contains('.com'))) {
             return 'invalid email';
           }
         } else if (label == 'Password') {
           if (value!.isEmpty || value.length < 6) {
             return 'password must be six characters at least ';
           }
-        } else {
+        } else if (!context.read<AuthProvider>().isSignIn) {
           if (value!.isEmpty || value.length < 6) {
             return 'user must be six characters at least ';
           }
         }
         return null;
       },
+      onChanged: (value) => label == 'E-mail adress'
+          ? context.read<AuthProvider>().onTextEmailChange(value)
+          : null,
       onSaved: (newValue) {
         label == 'Password'
             ? context.read<AuthProvider>().setPassword = newValue!

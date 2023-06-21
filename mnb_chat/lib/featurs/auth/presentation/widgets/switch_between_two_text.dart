@@ -22,6 +22,7 @@ class SwitchBetweenTwoText extends StatelessWidget {
         opacity: context.watch<AuthProvider>().isSignIn ? 0 : 1,
         child: Text(
           firstText,
+          overflow: TextOverflow.ellipsis,
           style: textStyle,
         ),
       ),
@@ -30,6 +31,7 @@ class SwitchBetweenTwoText extends StatelessWidget {
         opacity: !context.watch<AuthProvider>().isSignIn ? 0 : 1,
         child: Text(
           secondText,
+          overflow: TextOverflow.ellipsis,
           style: textStyle,
         ),
       ),

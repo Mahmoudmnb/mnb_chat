@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
@@ -25,7 +26,13 @@ class AlternativeSignInMethod extends StatelessWidget {
 
   InkWell imageContainer(String type, BuildContext context) {
     return InkWell(
-      onTap: () async {},
+      onTap: () async {
+        // type == 'Google'
+        //     ? context.read<AuthProvider>().signInWithGoogelAccount(context)
+        //     : () {
+        //         GoogleSignIn().signOut();
+        //       };
+      },
       child: Container(
         margin: const EdgeInsets.only(right: 20, top: 10),
         decoration: BoxDecoration(
@@ -56,6 +63,7 @@ Future<dynamic> showPasswordDialog(BuildContext context) {
     builder: (ctx) => AlertDialog(
       title: Text(
         'Enter password',
+        overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor),
       ),
@@ -85,6 +93,7 @@ Future<dynamic> showPasswordDialog(BuildContext context) {
               },
               child: const Text(
                 'Enter',
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontSize: 20),
               )),
         )

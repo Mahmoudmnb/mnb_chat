@@ -46,6 +46,8 @@ class InputBottom extends StatelessWidget {
                                 .watch<ChatProvider>()
                                 .selectedMessage!
                                 .fromName,
+overflow: TextOverflow.ellipsis,
+
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: deviceSize.width * 0.05),
@@ -53,6 +55,8 @@ class InputBottom extends StatelessWidget {
                           const SizedBox(height: 5),
                           Text(
                             context.watch<ChatProvider>().selectedMessage!.text,
+overflow: TextOverflow.ellipsis,
+
                           ),
                         ],
                       ),
@@ -115,9 +119,13 @@ class InputBottom extends StatelessWidget {
                     });
                   }
                 },
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge!.color),
                 decoration: InputDecoration.collapsed(
                     hintText: '',
-                    hintStyle: TextStyle(fontSize: deviceSize.width * 0.05)),
+                    hintStyle: TextStyle(
+                      fontSize: deviceSize.width * 0.05,
+                    )),
                 autocorrect: true,
                 focusNode: context.watch<ChatProvider>().focusNode,
                 onChanged: (value) {

@@ -38,7 +38,10 @@ class FriendList extends StatelessWidget {
                     },
                   );
                 } else {
-                  return const Text('please  wait');
+                  return const Text('please  wait',
+overflow: TextOverflow.ellipsis,
+                  
+                  );
                 }
               }),
         ]),

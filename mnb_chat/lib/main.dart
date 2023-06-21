@@ -28,17 +28,18 @@ Future<void> main(List<String> args) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  //* his is to know the path of the application to store files
   Constant.localPath = await getApplicationDocumentsDirectory();
   RemoteMessage? initialMessage =
       await FirebaseMessaging.instance.getInitialMessage();
   SharedPreferences db = await SharedPreferences.getInstance();
+  //* this is to know the height of the keyboard
   Constant.heightOfKeyboard = db.getDouble('heightOfKeyBoard') ?? 0;
-  var s = db.getString('Theme');
-
-  themeMode = s == 'light' ? ThemeMode.light : ThemeMode.dark;
   FirebaseFirestore.instance.settings =
       const Settings(cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  String th = db.getString('Theme') ?? '';
+  themeMode = th.isEmpty || th == 'light' ? ThemeMode.light : ThemeMode.dark;
   runApp(
     MultiProvider(
       providers: [

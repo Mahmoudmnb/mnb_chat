@@ -48,7 +48,7 @@ class MessageRow extends StatelessWidget {
                   : const SizedBox.shrink(),
               Expanded(
                 child: Container(
-                    alignment: message.from == friend.phoneNamber
+                    alignment: message.from == friend.email
                         ? Alignment.centerLeft
                         : Alignment.centerRight,
                     child: message.type == 'Image'

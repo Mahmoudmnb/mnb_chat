@@ -67,6 +67,8 @@ class RepliedMessagePop extends StatelessWidget {
                   children: [
                     Text(
                       message.fromName,
+overflow: TextOverflow.ellipsis,
+
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).textTheme.titleLarge!.color),
@@ -74,6 +76,8 @@ class RepliedMessagePop extends StatelessWidget {
                     const SizedBox(height: 5),
                     Text(
                       message.repliedText!,
+overflow: TextOverflow.ellipsis,
+
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).textTheme.titleLarge!.color),
@@ -86,6 +90,8 @@ class RepliedMessagePop extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             message.text,
+overflow: TextOverflow.ellipsis,
+
             style: const TextStyle(fontSize: 20),
           ),
           Row(
@@ -94,6 +100,8 @@ class RepliedMessagePop extends StatelessWidget {
             children: [
               Text(
                 '${(message.date).toDate().hour}:${(message.date).toDate().minute}',
+overflow: TextOverflow.ellipsis,
+
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.onError,
                     fontWeight: FontWeight.bold),

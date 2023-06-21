@@ -38,14 +38,14 @@ class FriendTile extends StatelessWidget {
                   Constant.currentUsre.name
               ? snapshot.data!.docs[index].data()['fromName']
               : snapshot.data!.docs[index].data()['toName'],
-          'number': snapshot.data!.docs[index].data()['to'] ==
-                  Constant.currentUsre.phoneNamber
+          'email': snapshot.data!.docs[index].data()['to'] ==
+                  Constant.currentUsre.email
               ? snapshot.data!.docs[index].data()['from']
               : snapshot.data!.docs[index].data()['to'],
         };
         chatReadContext.friend = UserModel.fromJson(map);
         String chatId = await chatReadContext.createChat();
-        homeReadContext.setCurrentFriendNum = map['number'];
+        homeReadContext.setCurrentFriendNum = map['email'];
         Navigator.of(context)
             .push(MaterialPageRoute(
           builder: (context) =>
@@ -69,7 +69,7 @@ class FriendTile extends StatelessWidget {
                   .collection('messages')
                   .doc(snapshot.data!.docs[index].data()['chatId'])
                   .collection('msg')
-                  .where('to', isEqualTo: Constant.currentUsre.phoneNamber)
+                  .where('to', isEqualTo: Constant.currentUsre.email)
                   .where('isReseved', isEqualTo: false)
                   .snapshots(),
               builder: (context, snapshot1) {
@@ -80,7 +80,10 @@ class FriendTile extends StatelessWidget {
                         decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.error,
                             borderRadius: BorderRadius.circular(15)),
-                        child: Text((snapshot1.data?.docs.length).toString()),
+                        child: Text((snapshot1.data?.docs.length).toString(),
+overflow: TextOverflow.ellipsis,
+                        
+                        ),
                       )
                     : const SizedBox.shrink();
               },
@@ -95,6 +98,8 @@ class FriendTile extends StatelessWidget {
           : Colors.white,
       title: Text(
         snapshot.data!.docs[index].data()['toName'].toString(),
+overflow: TextOverflow.ellipsis,
+
         style: TextStyle(
             color: Theme.of(context).textTheme.titleLarge!.color,
             fontWeight: FontWeight.bold,

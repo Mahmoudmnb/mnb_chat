@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mnb_chat/core/constant.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,7 +58,8 @@ class ProfilePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
                 Text(
-                  Constant.currentUsre.phoneNamber,
+                  Constant.currentUsre.email,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                       color: Theme.of(context).textTheme.titleLarge!.color,
                       fontSize: deviceWidth * 0.04),
@@ -84,6 +86,7 @@ class ProfilePage extends StatelessWidget {
                       tileColor: Theme.of(context).colorScheme.surface,
                       title: Text(
                         'Change image of the account',
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Theme.of(context).textTheme.titleLarge!.color,
                         ),
@@ -105,6 +108,7 @@ class ProfilePage extends StatelessWidget {
                       tileColor: Theme.of(context).colorScheme.surface,
                       title: Text(
                         'Update user name or naumber',
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Theme.of(context).textTheme.titleLarge!.color,
                         ),
@@ -126,6 +130,7 @@ class ProfilePage extends StatelessWidget {
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
                           builder: (context) => AuthPage(),
                         ));
+                        await FirebaseAuth.instance.signOut();
                       },
                       shape: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -134,6 +139,7 @@ class ProfilePage extends StatelessWidget {
                       tileColor: Theme.of(context).colorScheme.surface,
                       title: Text(
                         'Log out',
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Theme.of(context).textTheme.titleLarge!.color,
                         ),

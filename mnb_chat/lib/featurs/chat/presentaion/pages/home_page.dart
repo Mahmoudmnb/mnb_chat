@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     tabController = TabController(length: 3, vsync: this);
-    
+
     getPermision();
     initInfo();
     super.initState();
@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage>
     Stream<QuerySnapshot<Map<String, dynamic>>> data = FirebaseFirestore
         .instance
         .collection('users')
-        .doc(Constant.currentUsre.phoneNamber)
+        .doc(Constant.currentUsre.email)
         .collection('friends')
         .snapshots(includeMetadataChanges: true);
     var mainAppBar = AppBar(
@@ -61,6 +61,7 @@ class _HomePageState extends State<HomePage>
       elevation: 0,
       title: Text(
         'MNB CHAT',
+        overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
         style: TextStyle(color: Theme.of(context).textTheme.titleLarge!.color),
       ),
@@ -88,6 +89,7 @@ class _HomePageState extends State<HomePage>
       elevation: 0,
       title: Text(
         'convert to ...',
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(color: Theme.of(context).textTheme.titleLarge!.color),
       ),
       leading: IconButton(
@@ -226,6 +228,7 @@ class _HomePageState extends State<HomePage>
         ),
         Text(
           text,
+          overflow: TextOverflow.ellipsis,
           style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Theme.of(context).textTheme.titleLarge!.color),

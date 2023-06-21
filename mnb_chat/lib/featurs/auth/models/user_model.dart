@@ -1,27 +1,30 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 class UserModel {
   final String name;
-  final String phoneNamber;
+  final String email;
   final String token;
+  final String password;
   String? imgUrl;
 
   UserModel({
+    required this.password,
     required this.name,
-    required this.phoneNamber,
+    required this.email,
     required this.token,
     this.imgUrl,
   });
   factory UserModel.fromJson(Map<String, dynamic> map) {
     return UserModel(
+        password: map['password'] ?? '',
         token: map['token'],
         imgUrl: map['imgUrl'],
         name: map['name'],
-        phoneNamber: map['number']);
+        email: map['email']);
   }
   Map<String, dynamic> toJson() {
     return {
+      'password': password,
       'name': name,
-      'number': phoneNamber,
+      'email': email,
       'token': token,
       'imgUrl': imgUrl ?? ''
     };

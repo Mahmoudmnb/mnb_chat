@@ -100,10 +100,10 @@ class _ChatePageState extends State<ChatePage> {
                                 .add(false);
                             MessageModel message =
                                 snapshot.data!.docs[index].data();
-                            bool isme = message.from ==
-                                Constant.currentUsre.phoneNamber;
+                            bool isme =
+                                message.from == Constant.currentUsre.email;
                             return message.deletedFrom ==
-                                    Constant.currentUsre.phoneNamber
+                                    Constant.currentUsre.email
                                 ? const SizedBox.shrink()
                                 : GestureDetector(
                                     onTap: () {
@@ -128,7 +128,10 @@ class _ChatePageState extends State<ChatePage> {
                           },
                         );
                       } else {
-                        return const Text('loading');
+                        return const Text('loading',
+                                      overflow: TextOverflow.ellipsis,
+                        
+                        );
                         //! convert to animated loading widget
                       }
                     },
@@ -149,21 +152,6 @@ class _ChatePageState extends State<ChatePage> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         leadingWidth: deviceWidth * 0.1,
         actions: [
-          IconButton(
-              onPressed: () async {
-                FocusScope.of(context)
-                    .requestFocus(context.read<ChatProvider>().focusNode);
-              },
-              icon: Icon(
-                Icons.phone,
-                color: Theme.of(context).colorScheme.error,
-              )),
-          IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.video_call,
-                color: Theme.of(context).colorScheme.error,
-              )),
           PopupMenuButton(
             color: Theme.of(context).colorScheme.surface,
             icon: Icon(
@@ -176,6 +164,8 @@ class _ChatePageState extends State<ChatePage> {
                       onPressed: () async {},
                       child: Text(
                         'choose an image for background',
+                                      overflow: TextOverflow.ellipsis,
+
                         style: TextStyle(
                           fontSize: deviceWidth * 0.035,
                           color: Theme.of(context).textTheme.titleLarge!.color,
@@ -186,6 +176,8 @@ class _ChatePageState extends State<ChatePage> {
                       onPressed: () {},
                       child: Text(
                         'Clear chat history',
+                                      overflow: TextOverflow.ellipsis,
+
                         style: TextStyle(
                           fontSize: deviceWidth * 0.035,
                           color: Theme.of(context).textTheme.titleLarge!.color,
@@ -207,6 +199,7 @@ class _ChatePageState extends State<ChatePage> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   fontSize: deviceWidth * 0.07,
+                  overflow: TextOverflow.ellipsis,
                   color: Theme.of(context).textTheme.titleLarge!.color),
             ),
           ],
@@ -222,7 +215,12 @@ class _ChatePageState extends State<ChatePage> {
             icon: const Icon(Icons.cancel)),
         title: Text((watchContext.toMeSelectedMessage.length +
                 watchContext.fromMeSelectedMessage.length)
-            .toString()),
+            .toString()
+            
+            ,
+
+overflow: TextOverflow.ellipsis,
+            ),
         actions: [
           watchContext.toMeSelectedMessage.isEmpty &&
                   readContext.fromMeSelectedMessage.length == 1 &&
