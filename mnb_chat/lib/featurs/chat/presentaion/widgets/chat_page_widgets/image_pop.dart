@@ -125,7 +125,7 @@ class _ImagePopState extends State<ImagePop> {
                                                 .doc(widget.message.messageId)
                                                 .update({
                                               'reciverPath':
-                                                  '${Constant.localPath!.path}${widget.message.messageId}.jpg'
+                                                  '${Constant.appPath!.path}${widget.message.messageId}.jpg'
                                             });
                                           }
                                           return Center(
@@ -159,8 +159,7 @@ class _ImagePopState extends State<ImagePop> {
                           children: [
                             Text(
                               '${(widget.message.date).toDate().hour}:${(widget.message.date).toDate().minute}',
-overflow: TextOverflow.ellipsis,
-                            
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontSize: deviceSize.width * 0.04,
                                   fontWeight: FontWeight.bold),
@@ -218,7 +217,7 @@ overflow: TextOverflow.ellipsis,
     bool isMe = message.from == Constant.currentUsre.email;
     if (!isMe && message.reciverPath == null && message.text != '') {
       widget.task = await downloadManager.addDownload(
-          message.text, '${Constant.localPath!.path}${message.messageId}.jpg');
+          message.text, '${Constant.appPath!.path}${message.messageId}.jpg');
       setState(() {});
       downloadManager.getDownload(message.text);
     }

@@ -2,13 +2,15 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:mnb_chat/featurs/chat/presentaion/providers/home_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:toast/toast.dart';
 
 import '../../../../auth/models/user_model.dart';
 import '../../providers/chat_provider.dart';
 
-class InputBottom extends StatelessWidget {
+class InputBottom extends StatefulWidget {
   final String chatId;
   final UserModel freind;
   const InputBottom({
@@ -18,7 +20,23 @@ class InputBottom extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<InputBottom> createState() => _InputBottomState();
+}
+
+class _InputBottomState extends State<InputBottom> {
+  FlutterSoundRecorder recorder = FlutterSoundRecorder();
+  String nameOfVoice = '';
+  Duration durationOfVoice = Duration.zero;
+  @override
+  void initState() {
+    recorder.openRecorder();
+    recorder.setSubscriptionDuration(const Duration(seconds: 1));
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    ToastContext().init(context);
     Size deviceSize = MediaQuery.of(context).size;
     return Container(
       width: double.infinity,
@@ -46,8 +64,7 @@ class InputBottom extends StatelessWidget {
                                 .watch<ChatProvider>()
                                 .selectedMessage!
                                 .fromName,
-overflow: TextOverflow.ellipsis,
-
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: deviceSize.width * 0.05),
@@ -55,8 +72,7 @@ overflow: TextOverflow.ellipsis,
                           const SizedBox(height: 5),
                           Text(
                             context.watch<ChatProvider>().selectedMessage!.text,
-overflow: TextOverflow.ellipsis,
-
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -141,7 +157,7 @@ overflow: TextOverflow.ellipsis,
                     onPressed: () {
                       context
                           .read<ChatProvider>()
-                          .editOrSendOnTab(chatId, freind);
+                          .editOrSendOnTab(widget.chatId, widget.freind);
                     },
                     icon: Icon(
                       context.watch<ChatProvider>().editMode
@@ -159,19 +175,60 @@ overflow: TextOverflow.ellipsis,
                             if (image != null) {
                               context
                                   .read<ChatProvider>()
-                                  .uploadImage(chatId, image);
+                                  .uploadImage(widget.chatId, image);
                             }
                           },
                           icon: Icon(
                             Icons.camera_alt,
                             color: Theme.of(context).colorScheme.error,
                           )),
-                      IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.mic,
-                            color: Theme.of(context).colorScheme.error,
-                          ))
+                      Column(
+                        children: [
+                          StreamBuilder(
+                            stream: recorder.onProgress,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData && recorder.isRecording) {
+                                durationOfVoice = snapshot.data!.duration;
+                                return Text(snapshot.data!.duration.inSeconds
+                                    .toString());
+                              } else {
+                                return const SizedBox.shrink();
+                              }
+                            },
+                          ),
+                          InkWell(
+                              onTap: () async {
+                                if (recorder.isRecording) {
+                                  var path = await recorder.stopRecorder();
+                                  print(path);
+                                  var voice = File(path!);
+                                  context.read<ChatProvider>().uploadVoice(
+                                      voice,
+                                      nameOfVoice,
+                                      durationOfVoice,
+                                      widget.chatId);
+                                  // var player = AudioPlayer();
+                                  // player.play(DeviceFileSource(path));
+                                } else {
+                                  Toast.show('Long press to record');
+                                }
+                              },
+                              onLongPress: () {
+                                nameOfVoice =
+                                    context.read<ChatProvider>().generateId();
+                                recorder.startRecorder(toFile: nameOfVoice);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                child: Icon(
+                                  Icons.mic,
+                                  color: recorder.isRecording
+                                      ? Colors.red
+                                      : Colors.green,
+                                ),
+                              )),
+                        ],
+                      )
                     ],
                   )
           ]),

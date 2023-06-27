@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MessageModel {
+  String duration;
   double imageHeight;
   double imageWidth;
   String? senderPath;
@@ -20,6 +21,7 @@ class MessageModel {
   bool isReseved;
 
   MessageModel({
+    this.duration = '',
     this.imageHeight = 0,
     this.imageWidth = 0,
     this.senderPath,
@@ -40,6 +42,7 @@ class MessageModel {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'duration': duration,
       'imageHeight': imageHeight,
       'imageWidth': imageWidth,
       'senderPath': senderPath,
@@ -61,6 +64,7 @@ class MessageModel {
 
   factory MessageModel.fromMap(Map<String, dynamic> map) {
     return MessageModel(
+      duration: map['duration'] ?? '',
       imageHeight: map['imageHeight'] as double,
       imageWidth: map['imageWidth'] as double,
       senderPath:

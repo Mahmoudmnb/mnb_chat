@@ -9,6 +9,7 @@ import '../widgets/widgets_paths.dart';
 class AuthPage extends StatelessWidget {
   AuthPage({Key? key}) : super(key: key);
   final formKey = GlobalKey<FormState>();
+  final resetpasswordKay = GlobalKey<FormState>();
   TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -89,10 +90,10 @@ class AuthPage extends StatelessWidget {
                                     maxHight: 35,
                                     child: TextButton(
                                       onPressed: () {
-                                        // showResetDialog(context);
-                                        context
-                                            .read<AuthProvider>()
-                                            .changePassword();
+                                        showResetDialog(context);
+                                        // context
+                                        //     .read<AuthProvider>()
+                                        //     .changePassword();
                                       },
                                       child: const Text('Forgot password ?',
                                           overflow: TextOverflow.ellipsis,
@@ -203,46 +204,72 @@ class AuthPage extends StatelessWidget {
   }
 
   bool isLoding = false;
-  // Future<dynamic> showResetDialog(BuildContext context) {
-  //   controller = TextEditingController();
-  //   return showDialog(
-  //     context: context,
-  //     builder: (ctx) => AlertDialog(
-  //       title: Text(
-  //         'Reset password',
-  //         textAlign: TextAlign.center,
-  //         style: TextStyle(fontSize: 20, color: Theme.of(context).primaryColor),
-  //       ),
-  //       content: Container(
-  //           alignment: Alignment.center,
-  //           padding: const EdgeInsets.all(5),
-  //           height: 50,
-  //           decoration: BoxDecoration(
-  //               borderRadius: BorderRadius.circular(15),
-  //               border: Border.all(color: Theme.of(context).primaryColor)),
-  //           child: TextField(
-  //             keyboardType: TextInputType.emailAddress,
-  //             controller: controller,
-  //             decoration: const InputDecoration.collapsed(hintText: 'email'),
-  //           )),
-  //       alignment: Alignment.center,
-  //       actions: [
-  //         Center(
-  //             child: StatefulBuilder(
-  //           builder: (context, setState) => TextButton(
-  //               onPressed: () async {},
-  //               child: !isLoding
-  //                   ? const Text(
-  //                       'Reset',
-  //                       overflow: TextOverflow.ellipsis,
-  //                       style: TextStyle(fontSize: 20),
-  //                     )
-  //                   : const CircularProgressIndicator()),
-  //         ))
-  //       ],
-  //     ),
-  //   );
-  // }
+  Future<dynamic> showResetDialog(BuildContext context) {
+    controller = TextEditingController();
+    return showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text(
+          'Reset password',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 20, color: Colors.black),
+        ),
+        content: Form(
+            key: resetpasswordKay,
+            child: TextFormField(
+              controller: controller,
+              keyboardType: TextInputType.emailAddress,
+              cursorColor: Colors.black,
+              decoration: InputDecoration(
+                errorStyle: const TextStyle(color: Colors.red),
+                focusedErrorBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red)),
+                errorBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red)),
+                labelStyle: const TextStyle(color: Colors.black),
+                focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.black)),
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey.shade500)),
+                label: const Text(
+                  'Email',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              validator: (value) {
+                if ((value!.isEmpty ||
+                    !value.contains('@') ||
+                    !value.contains('.com'))) {
+                  return 'invalid email';
+                }
+                return null;
+              },
+            )),
+        alignment: Alignment.center,
+        actions: [
+          Center(
+              child: StatefulBuilder(
+            builder: (context, setState) => TextButton(
+                onPressed: () async {
+                  if (resetpasswordKay.currentState!.validate()) {
+                    context
+                        .read<AuthProvider>()
+                        .changePassword(controller.text, context);
+                  }
+                },
+                child: !isLoding
+                    ? const Text(
+                        'Reset',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 20),
+                      )
+                    : const CircularProgressIndicator()),
+          ))
+        ],
+      ),
+    );
+  }
 
   logicButton(BuildContext context) async {
     bool isvalidete = formKey.currentState!.validate();

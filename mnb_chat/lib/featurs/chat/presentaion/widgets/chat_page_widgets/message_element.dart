@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mnb_chat/featurs/chat/presentaion/providers/home_provider.dart';
 import 'package:mnb_chat/featurs/chat/presentaion/widgets/chat_page_widgets/radio_button.dart';
+import 'package:mnb_chat/featurs/chat/presentaion/widgets/chat_page_widgets/voice_pop.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../auth/models/user_model.dart';
@@ -51,21 +52,29 @@ class MessageRow extends StatelessWidget {
                     alignment: message.from == friend.email
                         ? Alignment.centerLeft
                         : Alignment.centerRight,
-                    child: message.type == 'Image'
-                        ? ImagePop(
-                            chatId: chatId,
+                    child: message.type == 'Voice'
+                        ? VoicPop(
+                            isme: isme,
                             message: message,
-                            deviceSize: deviceSize,
-                          )
-                        : message.isreplied
-                            ? RepliedMessagePop(
-                                chatId: chatId, isme: isme, message: message)
-                            : MessagePop(
-                                friend: friend,
+                            chatId: chatId,
+                            friend: friend)
+                        : message.type == 'Image'
+                            ? ImagePop(
                                 chatId: chatId,
-                                isme: isme,
                                 message: message,
-                              )),
+                                deviceSize: deviceSize,
+                              )
+                            : message.isreplied
+                                ? RepliedMessagePop(
+                                    chatId: chatId,
+                                    isme: isme,
+                                    message: message)
+                                : MessagePop(
+                                    friend: friend,
+                                    chatId: chatId,
+                                    isme: isme,
+                                    message: message,
+                                  )),
               ),
             ],
           ),

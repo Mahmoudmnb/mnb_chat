@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mnb_chat/core/internet_info.dart';
 import 'package:mnb_chat/featurs/auth/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -199,7 +198,7 @@ class AuthProvider extends ChangeNotifier {
 //         // Obtain the auth details from the request
 //         final GoogleSignInAuthentication? googleAuth =
 //             await googleUser?.authentication;
-// 
+//
 //         // Create a new credential
 //         final credential = GoogleAuthProvider.credential(
 //           accessToken: googleAuth?.accessToken,
@@ -242,7 +241,7 @@ class AuthProvider extends ChangeNotifier {
 //         }
 //       } catch (e) {
 //         Toast.show('something went wrong please try again');
-// 
+//
 //         print(e);
 //       }
 //     } else {
@@ -262,9 +261,36 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  changePassword() async {
-    var re = await FirebaseAuth.instance
-        .sendPasswordResetEmail(email: 'Mahmoudmnb2000.2004@gmail.com')
-        .onError((error, stackTrace) => print(error));
+  changePassword(String email, BuildContext context) async {
+    bool isError = false;
+    ToastContext toastContext = ToastContext();
+    toastContext.init(context);
+    bool isConnected = await InternetInfo.isconnected();
+    if (isConnected) {
+      try {
+        await FirebaseAuth.instance.sendPasswordResetEmail(email: email).then(
+            (value) => Toast.show('check your box email to reset password'));
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'invalid-email') {
+          Toast.show(' invalid-email', duration: 2);
+        } else if (e.code == 'unknown') {
+          Toast.show('please check your vpn if you live in a forbidden city',
+              duration: 2);
+          _isButtonLoanding = false;
+          notifyListeners();
+        } else if (e.code == 'user-not-found') {
+          Toast.show('No user found for that email.', duration: 2);
+        } else if (e.code == 'wrong-password') {
+          Toast.show('Wrong password provided for that user.', duration: 2);
+        } else {
+          print(e.code);
+        }
+        isError = true;
+      } catch (e) {
+        print(e);
+      }
+    } else {
+      Toast.show('check you internet connection');
+    }
   }
 }

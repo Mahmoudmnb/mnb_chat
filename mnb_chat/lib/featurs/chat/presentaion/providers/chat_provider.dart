@@ -179,8 +179,7 @@ class ChatProvider extends ChangeNotifier {
           builder: (context) => AlertDialog(
                 title: const Text(
                   'Delete message',
-overflow: TextOverflow.ellipsis,
-
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 25),
                 ),
                 content: SizedBox(
@@ -189,8 +188,7 @@ overflow: TextOverflow.ellipsis,
                     children: [
                       const Text(
                         'Do you realy want to delete this message ?',
-overflow: TextOverflow.ellipsis,
-
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 15),
                       ),
                       StatefulBuilder(
@@ -207,8 +205,7 @@ overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               'delete also from ${friend!.name} ?',
-overflow: TextOverflow.ellipsis,
-
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(fontSize: 15),
                             ),
                           ],
@@ -224,8 +221,7 @@ overflow: TextOverflow.ellipsis,
                       },
                       child: const Text(
                         'Delete',
-overflow: TextOverflow.ellipsis,
-
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 20),
                       )),
                   TextButton(
@@ -234,8 +230,7 @@ overflow: TextOverflow.ellipsis,
                       },
                       child: const Text(
                         'Cancel',
-overflow: TextOverflow.ellipsis,
-
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 20),
                       ))
                 ],
@@ -462,7 +457,7 @@ overflow: TextOverflow.ellipsis,
         .doc(id)
         .set(message.toMap());
     var comImage = await FlutterImageCompress.compressAndGetFile(
-        pickedImage.absolute.path, '${Constant.localPath!.path}$id.jpg');
+        pickedImage.absolute.path, '${Constant.appPath!.path}$id.jpg');
     File pickeImageFile = File(comImage!.path);
     FirebaseStorage.instance
         .ref('chat')
@@ -660,6 +655,46 @@ overflow: TextOverflow.ellipsis,
     }
     isConvertedMode = false;
 
+    notifyListeners();
+  }
+
+  uploadVoice(File voice, String id, Duration duration, String chatId) async {
+    MessageModel message = MessageModel(
+        duration: duration.toString(),
+        senderPath: voice.path,
+        type: 'Voice',
+        isreplied: isReplied,
+        repliedText: isReplied ? selectedMessage!.text : null,
+        fromName: Constant.currentUsre.name,
+        messageId: id,
+        text: '',
+        date: Timestamp.now(),
+        from: Constant.currentUsre.email,
+        to: friend!.email);
+    await FirebaseFirestore.instance
+        .collection('messages')
+        .doc(chatId)
+        .collection('msg')
+        .doc(id)
+        .set(message.toMap());
+    FirebaseStorage.instance
+        .ref('chat')
+        .child(id)
+        .putFile(voice)
+        .snapshotEvents
+        .listen((event) async {
+      if (event.state == TaskState.success) {
+        await FirebaseFirestore.instance
+            .collection('messages')
+            .doc(chatId)
+            .collection('msg')
+            .doc(id)
+            .update({'isSent': true, 'text': await event.ref.getDownloadURL()});
+        sendPushMessage('Voice', Constant.currentUsre.name, friend!.token,
+            Constant.currentUsre.email, chatId, friend!);
+      }
+    });
+    moveToEnd();
     notifyListeners();
   }
 }
