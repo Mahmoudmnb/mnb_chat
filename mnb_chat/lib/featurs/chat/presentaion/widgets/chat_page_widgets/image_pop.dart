@@ -1,6 +1,6 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 // ignore_for_file: must_be_immutable
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -60,6 +60,9 @@ class _ImagePopState extends State<ImagePop> {
             onTap: () {
               imageOnTab(isMe);
             },
+            onLongPress: () {
+              print(widget.message.senderPath);
+            },
             child: Container(
                 decoration: BoxDecoration(
                     color: Colors.grey,
@@ -96,18 +99,28 @@ class _ImagePopState extends State<ImagePop> {
                                                 size: 40,
                                               ))
                                             : const SizedBox.shrink())
-                                    : File(widget.message.reciverPath!)
-                                            .isAbsolute
-                                        ? ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            child: Image.file(
-                                              File(widget.message.reciverPath!),
-                                            ),
-                                          )
-                                        : const CircularProgressIndicator(
-                                            value: 1,
-                                          ),
+                                    : FutureBuilder(
+                                        future:
+                                            File(widget.message.reciverPath!)
+                                                .exists(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            return snapshot.data!
+                                                ? ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15),
+                                                    child: Image.file(
+                                                      File(widget.message
+                                                          .reciverPath!),
+                                                    ),
+                                                  )
+                                                : const SizedBox();
+                                          } else {
+                                            return const SizedBox.shrink();
+                                          }
+                                        },
+                                      ),
                                 widget.message.reciverPath == null &&
                                         widget.task != null &&
                                         widget.task!.status.value !=
@@ -118,23 +131,41 @@ class _ImagePopState extends State<ImagePop> {
                                         valueListenable: widget.task!.progress,
                                         builder: (context, value, child) {
                                           if (value == 1.0) {
-                                            FirebaseFirestore.instance
-                                                .collection('messages')
-                                                .doc(widget.chatId)
-                                                .collection('msg')
-                                                .doc(widget.message.messageId)
-                                                .update({
-                                              'reciverPath':
-                                                  '${Constant.appPath!.path}${widget.message.messageId}.jpg'
+                                            if (!isMe) {
+                                              FirebaseFirestore.instance
+                                                  .collection('messages')
+                                                  .doc(widget.chatId)
+                                                  .collection('msg')
+                                                  .doc(widget.message.messageId)
+                                                  .update({
+                                                'reciverPath':
+                                                    '/data/user/0/com.example.mnb_chat/cache/${widget.message.messageId}.jpg'
+                                              });
+                                            }
+                                            Timer.periodic(
+                                                const Duration(seconds: 1),
+                                                (timer) {
+                                              if (isMe &&
+                                                      File(widget.message
+                                                              .senderPath!)
+                                                          .existsSync() ||
+                                                  !isMe &&
+                                                      File(widget.message
+                                                              .reciverPath!)
+                                                          .existsSync()) {
+                                                setState(() {});
+                                                timer.cancel();
+                                              }
                                             });
                                           }
                                           return Center(
                                             child: Stack(children: [
                                               Align(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  value: value,
-                                                ),
+                                                child: value == 0
+                                                    ? const CircularProgressIndicator()
+                                                    : CircularProgressIndicator(
+                                                        value: value,
+                                                      ),
                                               ),
                                               const Align(
                                                   child: Icon(Icons.cancel))
@@ -187,7 +218,7 @@ class _ImagePopState extends State<ImagePop> {
     if ((widget.message.reciverPath == null &&
             widget.message.text != '' &&
             !isMe) ||
-        !File(widget.message.senderPath!).isAbsolute) {
+        !File(widget.message.senderPath!).existsSync()) {
       if (widget.task == null) {
         downloadImage(widget.message);
       } else if (widget.task!.status.value == DownloadStatus.downloading) {
@@ -197,7 +228,9 @@ class _ImagePopState extends State<ImagePop> {
         setState(() {});
         downloadManager.resumeDownload(widget.message.text);
       }
-      if (isMe && widget.message.text != '') {
+      if (isMe &&
+          widget.message.text != '' &&
+          File(widget.message.senderPath!).existsSync()) {
         var image = Image.file(File(widget.message.senderPath!)).image;
         showImageViewer(context, image);
       } else if (!isMe && widget.message.reciverPath != null) {
@@ -215,9 +248,10 @@ class _ImagePopState extends State<ImagePop> {
 
   downloadImage(MessageModel message) async {
     bool isMe = message.from == Constant.currentUsre.email;
-    if (!isMe && message.reciverPath == null && message.text != '') {
-      widget.task = await downloadManager.addDownload(
-          message.text, '${Constant.appPath!.path}${message.messageId}.jpg');
+    if (!isMe && message.reciverPath == null && message.text != '' ||
+        !File(message.senderPath!).existsSync()) {
+      widget.task = await downloadManager.addDownload(message.text,
+          '/data/user/0/com.example.mnb_chat/cache/${message.messageId}.jpg');
       setState(() {});
       downloadManager.getDownload(message.text);
     }

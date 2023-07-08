@@ -128,9 +128,9 @@ class _ChatePageState extends State<ChatePage> {
                           },
                         );
                       } else {
-                        return const Text('loading',
-                                      overflow: TextOverflow.ellipsis,
-                        
+                        return const Text(
+                          'loading',
+                          overflow: TextOverflow.ellipsis,
                         );
                         //! convert to animated loading widget
                       }
@@ -164,8 +164,7 @@ class _ChatePageState extends State<ChatePage> {
                       onPressed: () async {},
                       child: Text(
                         'choose an image for background',
-                                      overflow: TextOverflow.ellipsis,
-
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: deviceWidth * 0.035,
                           color: Theme.of(context).textTheme.titleLarge!.color,
@@ -176,8 +175,7 @@ class _ChatePageState extends State<ChatePage> {
                       onPressed: () {},
                       child: Text(
                         'Clear chat history',
-                                      overflow: TextOverflow.ellipsis,
-
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: deviceWidth * 0.035,
                           color: Theme.of(context).textTheme.titleLarge!.color,
@@ -193,14 +191,15 @@ class _ChatePageState extends State<ChatePage> {
                   Theme.of(context).colorScheme.error.withOpacity(0.3),
             ),
             SizedBox(width: deviceWidth * 0.03),
-            Text(
-              name,
-              softWrap: true,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontSize: deviceWidth * 0.07,
-                  overflow: TextOverflow.ellipsis,
-                  color: Theme.of(context).textTheme.titleLarge!.color),
+            SizedBox(
+              width: deviceWidth * 0.5,
+              child: Text(
+                name,
+                style: TextStyle(
+                    fontSize: deviceWidth * 0.07,
+                    overflow: TextOverflow.ellipsis,
+                    color: Theme.of(context).textTheme.titleLarge!.color),
+              ),
             ),
           ],
         ),
@@ -213,18 +212,16 @@ class _ChatePageState extends State<ChatePage> {
         leading: IconButton(
             onPressed: () => readContext.cancelOnTab(),
             icon: const Icon(Icons.cancel)),
-        title: Text((watchContext.toMeSelectedMessage.length +
-                watchContext.fromMeSelectedMessage.length)
-            .toString()
-            
-            ,
-
-overflow: TextOverflow.ellipsis,
-            ),
+        title: Text(
+          (watchContext.toMeSelectedMessage.length +
+                  watchContext.fromMeSelectedMessage.length)
+              .toString(),
+          overflow: TextOverflow.ellipsis,
+        ),
         actions: [
           watchContext.toMeSelectedMessage.isEmpty &&
-                  readContext.fromMeSelectedMessage.length == 1 &&
-                  watchContext.selectedMessage!.type != 'Image'
+                  watchContext.fromMeSelectedMessage.length == 1 &&
+                  watchContext.fromMeSelectedMessage[0].type == 'Message'
               ? IconButton(
                   onPressed: () {
                     readContext.editOnTab(context);
@@ -238,9 +235,8 @@ overflow: TextOverflow.ellipsis,
               icon: const Icon(Icons.copy)),
           IconButton(
               onPressed: () async {
-                context
-                    .read<ChatProvider>()
-                    .deleteOnTab(chatId, context, friend);
+                context.read<ChatProvider>().deleteOnTab(
+                    chatId, context, friend, deviceHight, deviceWidth);
               },
               icon: const Icon(Icons.delete)),
         ],

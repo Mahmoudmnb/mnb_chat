@@ -1,17 +1,21 @@
-import 'package:audio_waveforms/audio_waveforms.dart';
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '';
 
 import 'core/constant.dart';
 
+import 'featurs/Auth/presentation/pages/auth_page.dart';
 import 'featurs/Auth/presentation/provider/auth_provider.dart';
+import 'featurs/auth/models/user_model.dart';
+import 'featurs/chat/presentaion/pages/home_page.dart';
 import 'featurs/chat/presentaion/providers/chat_provider.dart';
 import 'featurs/chat/presentaion/providers/home_provider.dart';
 import 'firebase_options.dart';
@@ -41,7 +45,7 @@ Future<void> main(List<String> args) async {
   themeMode = th.isEmpty || th == 'light' ? ThemeMode.light : ThemeMode.dark;
   //* request permissoin for mic
   Permission.microphone.request();
-
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(
     MultiProvider(
       providers: [
@@ -75,89 +79,23 @@ class _MyAppState extends State<MyApp> {
       darkTheme: Constant.darkTheme,
       themeMode: context.watch<HomeProvider>().themeMode,
       debugShowCheckedModeBanner: false,
-      home: const Voice(),
-      // home: FutureBuilder(
-      //   future: SharedPreferences.getInstance(),
-      //   builder: (context, snapshot) {
-      //     if (snapshot.hasData) {
-      //       if (snapshot.data?.getString('currentUser') != null) {
-      //         UserModel currentUser = UserModel.fromJson(
-      //             json.decode(snapshot.data!.getString('currentUser')!));
-      //         Constant.currentUsre = currentUser;
-      //         return HomePage(user: currentUser);
-      //       } else {
-      //         return AuthPage();
-      //       }
-      //     }
-      //     return const Center(
-      //       child: CircularProgressIndicator(),
-      //     );
-      //   },
-      // ),
-    );
-  }
-}
-
-class Voice extends StatefulWidget {
-  const Voice({super.key});
-
-  @override
-  State<Voice> createState() => _VoiceState();
-}
-
-class _VoiceState extends State<Voice> {
-  RecorderController recorderController = RecorderController();
-  late PlayerController playerController;
-  String path = '';
-  List<double> waves = [];
-  @override
-  void initState() {
-    playerController = PlayerController();
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.purple[200],
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AudioWaveforms(
-                size: const Size(100, 100),
-                recorderController: recorderController),
-            TextButton(
-                onPressed: () {
-                  print(recorderController.hasPermission);
-                  recorderController.record();
-                },
-                child: const Text('Record')),
-            TextButton(
-                onPressed: () async {
-                  path = await recorderController.stop() ?? '';
-                  waves = recorderController.waveData;
-                  setState(() {});
-                  print(path);
-                },
-                child: const Text('Stop')),
-           
-            TextButton(
-                onPressed: () async {
-                  // playerController = PlayerController();
-
-                  await playerController.preparePlayer(path: path);
-                  playerController.startPlayer(finishMode: FinishMode.stop);
-                },
-                child: const Text('play voice')),
-            TextButton(
-                onPressed: () {
-                  print(playerController.playerState);
-                  //  print(recorderController.isRecording);
-                },
-                child: const Text('isPlaying'))
-          ],
-        ),
+      home: FutureBuilder(
+        future: SharedPreferences.getInstance(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data?.getString('currentUser') != null) {
+              UserModel currentUser = UserModel.fromJson(
+                  json.decode(snapshot.data!.getString('currentUser')!));
+              Constant.currentUsre = currentUser;
+              return HomePage(user: currentUser);
+            } else {
+              return AuthPage();
+            }
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
       ),
     );
   }

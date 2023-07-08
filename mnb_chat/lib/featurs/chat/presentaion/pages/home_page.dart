@@ -111,7 +111,8 @@ class _HomePageState extends State<HomePage>
         ContactList(currentFriendNum: currentFriendNum),
         const ProfilePage()
       ]),
-      bottomSheet: Container(
+      //! change it to bottom navigation bar
+      bottomNavigationBar: Container(
         height: deviceHeight * 0.1,
         alignment: Alignment.center,
         width: double.infinity,

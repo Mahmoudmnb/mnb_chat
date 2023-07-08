@@ -13,6 +13,11 @@ class AuthPage extends StatelessWidget {
   TextEditingController controller = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    double getHeightOfKeyboard() {
+      return MediaQuery.of(context).viewInsets.bottom +
+          MediaQuery.of(context).viewPadding.bottom;
+    }
+
     ToastContext toastContext = ToastContext();
     toastContext.init(context);
     final deviceSize = MediaQuery.of(context).size;
@@ -23,6 +28,8 @@ class AuthPage extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.onBackground,
         body: GestureDetector(
           onTap: () {
+            // print((MediaQuery.of(context).viewInsets.bottom +
+            //     MediaQuery.of(context).viewPadding.bottom));
             FocusScope.of(context).unfocus();
           },
           child: SafeArea(
@@ -77,7 +84,7 @@ class AuthPage extends StatelessWidget {
                                     TextStyle(color: Colors.grey.shade600),
                               )),
                           SizedBox(height: heightOfDevice * 0.02),
-                          AuthForm(formKey: formKey),
+                          AuthForm(formKey: formKey,getHeightOfKeyboard: getHeightOfKeyboard(),),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
@@ -204,6 +211,7 @@ class AuthPage extends StatelessWidget {
   }
 
   bool isLoding = false;
+
   Future<dynamic> showResetDialog(BuildContext context) {
     controller = TextEditingController();
     return showDialog(

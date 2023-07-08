@@ -11,11 +11,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/constant.dart';
 import '../../../auth/models/user_model.dart';
 import '../../models/message.dart';
+import 'home_provider.dart';
 
 class ChatProvider extends ChangeNotifier {
 //!                     **********************************       variabels      ***************************************************
@@ -148,7 +150,8 @@ class ChatProvider extends ChangeNotifier {
 
   //* to delete a message or Image
 
-  deleteOnTab(chatId, context, freind) async {
+  deleteOnTab(chatId, context, freind, double hightOfDevice,
+      double widthOfDevice) async {
     for (var element in toMeSelectedMessage) {
       var selectedMessage = FirebaseFirestore.instance
           .collection('messages')
@@ -177,20 +180,25 @@ class ChatProvider extends ChangeNotifier {
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
-                title: const Text(
+                backgroundColor:
+                    context.watch<HomeProvider>().themeMode == ThemeData.light()
+                        ? Colors.black
+                        : Colors.white,
+                title: Text(
                   'Delete message',
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 25),
+                  style: TextStyle(
+                    fontSize: widthOfDevice * 0.08,
+                    color: context.watch<HomeProvider>().themeMode ==
+                            ThemeData.light()
+                        ? Colors.white
+                        : Colors.black,
+                  ),
                 ),
                 content: SizedBox(
-                  height: 86,
+                  height: hightOfDevice * 0.1,
                   child: Column(
                     children: [
-                      const Text(
-                        'Do you realy want to delete this message ?',
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 15),
-                      ),
                       StatefulBuilder(
                         builder: (context, setState) => Row(
                           children: [
@@ -206,7 +214,14 @@ class ChatProvider extends ChangeNotifier {
                             Text(
                               'delete also from ${friend!.name} ?',
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 15),
+                              style: TextStyle(
+                                fontSize: widthOfDevice * 0.04,
+                                color:
+                                    context.watch<HomeProvider>().themeMode ==
+                                            ThemeData.light()
+                                        ? Colors.white
+                                        : Colors.black,
+                              ),
                             ),
                           ],
                         ),
@@ -219,19 +234,31 @@ class ChatProvider extends ChangeNotifier {
                       onPressed: () {
                         Navigator.of(context).pop(checkBoxKey);
                       },
-                      child: const Text(
+                      child: Text(
                         'Delete',
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(
+                          fontSize: widthOfDevice * 0.05,
+                          color: context.watch<HomeProvider>().themeMode ==
+                                  ThemeData.light()
+                              ? Colors.white
+                              : Colors.black,
+                        ),
                       )),
                   TextButton(
                       onPressed: () {
                         Navigator.of(context).pop(null);
                       },
-                      child: const Text(
+                      child: Text(
                         'Cancel',
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(
+                          fontSize: widthOfDevice * 0.05,
+                          color: context.watch<HomeProvider>().themeMode ==
+                                  ThemeData.light()
+                              ? Colors.white
+                              : Colors.black,
+                        ),
                       ))
                 ],
               )).then((value) async {
@@ -427,7 +454,11 @@ class ChatProvider extends ChangeNotifier {
   Future<File?> pickImage() async {
     var r = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (r != null) {
-      return File(r.path);
+      String id = generateId();
+      File finalFile = await File(r.path)
+          .copy('/data/user/0/com.example.mnb_chat/cache/$id.jpg');
+      File(r.path).delete();
+      return finalFile;
     } else {
       return null;
     }
@@ -435,7 +466,7 @@ class ChatProvider extends ChangeNotifier {
 
 //* this is for sending an image
   uploadImage(String chatId, File pickedImage) async {
-    String id = generateId();
+    String id = pickedImage.path.split('/').last.split('.').first;
     var decodedImage = await decodeImageFromList(pickedImage.readAsBytesSync());
     MessageModel message = MessageModel(
         imageHeight: decodedImage.height * 1.0,
@@ -658,9 +689,9 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  uploadVoice(File voice, String id, Duration duration, String chatId) async {
+  uploadVoice(File voice, String id, String duration, String chatId) async {
     MessageModel message = MessageModel(
-        duration: duration.toString(),
+        duration: duration,
         senderPath: voice.path,
         type: 'Voice',
         isreplied: isReplied,

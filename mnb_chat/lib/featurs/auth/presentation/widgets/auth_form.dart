@@ -1,12 +1,21 @@
-import 'package:provider/provider.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'hide_item.dart';
+import 'package:mnb_chat/core/constant.dart';
+
 import '../provider/auth_provider.dart';
+import 'hide_item.dart';
 
 class AuthForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
-  const AuthForm({Key? key, required this.formKey}) : super(key: key);
+  final getHeightOfKeyboard;
+  const AuthForm({
+    Key? key,
+    required this.formKey,
+    required this.getHeightOfKeyboard,
+  }) : super(key: key);
 
   @override
   State<AuthForm> createState() => _AuthFormState();
@@ -127,9 +136,19 @@ class _AuthFormState extends State<AuthForm> {
         }
         return null;
       },
-      onChanged: (value) => label == 'E-mail adress'
-          ? context.read<AuthProvider>().onTextEmailChange(value)
-          : null,
+      onChanged: (value) async {
+        if (label == 'E-mail adress') {
+          Constant.heightOfKeyboard =
+              (MediaQuery.of(context).viewInsets.bottom +
+                  MediaQuery.of(context).viewPadding.bottom);
+          print(Constant.heightOfKeyboard);
+          SharedPreferences db = await SharedPreferences.getInstance();
+          db.setDouble('heightOfKeyBoard', Constant.heightOfKeyboard);
+        }
+        label == 'E-mail adress'
+            ? context.read<AuthProvider>().onTextEmailChange(value)
+            : null;
+      },
       onSaved: (newValue) {
         label == 'Password'
             ? context.read<AuthProvider>().setPassword = newValue!

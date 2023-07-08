@@ -27,6 +27,7 @@ class _InputBottomState extends State<InputBottom> {
   FlutterSoundRecorder recorder = FlutterSoundRecorder();
   String nameOfVoice = '';
   Duration durationOfVoice = Duration.zero;
+  Color colorOfMicIcon = const Color.fromRGBO(227, 152, 1, 1);
   @override
   void initState() {
     recorder.openRecorder();
@@ -67,12 +68,21 @@ class _InputBottomState extends State<InputBottom> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: deviceSize.width * 0.05),
+                                fontSize: deviceSize.width * 0.05,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .color),
                           ),
                           const SizedBox(height: 5),
                           Text(
                             context.watch<ChatProvider>().selectedMessage!.text,
                             overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge!
+                                    .color),
                           ),
                         ],
                       ),
@@ -189,8 +199,14 @@ class _InputBottomState extends State<InputBottom> {
                             builder: (context, snapshot) {
                               if (snapshot.hasData && recorder.isRecording) {
                                 durationOfVoice = snapshot.data!.duration;
-                                return Text(snapshot.data!.duration.inSeconds
-                                    .toString());
+                                return Text(
+                                  snapshot.data!.duration.inSeconds.toString(),
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .textTheme
+                                          .titleLarge!
+                                          .color),
+                                );
                               } else {
                                 return const SizedBox.shrink();
                               }
@@ -199,32 +215,35 @@ class _InputBottomState extends State<InputBottom> {
                           InkWell(
                               onTap: () async {
                                 if (recorder.isRecording) {
+                                  colorOfMicIcon =
+                                      Theme.of(context).colorScheme.error;
+                                  setState(() {});
                                   var path = await recorder.stopRecorder();
-                                  print(path);
                                   var voice = File(path!);
                                   context.read<ChatProvider>().uploadVoice(
                                       voice,
                                       nameOfVoice,
-                                      durationOfVoice,
+                                      '${durationOfVoice.inHours}:${durationOfVoice.inMinutes}:${durationOfVoice.inSeconds}',
                                       widget.chatId);
-                                  // var player = AudioPlayer();
-                                  // player.play(DeviceFileSource(path));
+                                  setState(() {});
                                 } else {
                                   Toast.show('Long press to record');
                                 }
                               },
                               onLongPress: () {
+                                setState(() {
+                                  colorOfMicIcon = Colors.red;
+                                });
                                 nameOfVoice =
                                     context.read<ChatProvider>().generateId();
+                                recorder.openRecorder();
                                 recorder.startRecorder(toFile: nameOfVoice);
                               },
                               child: Container(
                                 padding: const EdgeInsets.all(10),
                                 child: Icon(
                                   Icons.mic,
-                                  color: recorder.isRecording
-                                      ? Colors.red
-                                      : Colors.green,
+                                  color: colorOfMicIcon,
                                 ),
                               )),
                         ],

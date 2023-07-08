@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../providers/chat_provider.dart';
 
-
 class AlternativeBottomInput extends StatelessWidget {
   const AlternativeBottomInput({
     Key? key,
@@ -37,28 +36,33 @@ class AlternativeBottomInput extends StatelessWidget {
                   onPressed: () {
                     context.read<ChatProvider>().replyOnTab();
                   },
-                  label: const Text(
+                  label: Text(
                     'Reply',
-overflow: TextOverflow.ellipsis,
-
-                    style: TextStyle(fontSize: 20),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: Theme.of(context).textTheme.titleLarge!.color),
                   ),
-                  icon: const Icon(Icons.arrow_back))
+                  icon: Icon(Icons.arrow_back,
+                      color: Theme.of(context).textTheme.titleLarge!.color))
               : const SizedBox.shrink(),
           InkWell(
               onTap: () {
                 context.read<ChatProvider>().convertMessageOnTab(context);
               },
-              child: const Row(
+              child: Row(
                 children: [
                   Text(
                     'Convert',
-overflow: TextOverflow.ellipsis,
-
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).textTheme.titleLarge!.color),
                   ),
-                  SizedBox(width: 5),
-                  Icon(Icons.arrow_forward)
+                  const SizedBox(width: 5),
+                  Icon(Icons.arrow_forward,
+                      color: Theme.of(context).textTheme.titleLarge!.color)
                 ],
               )),
         ],
