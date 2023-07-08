@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:mnb_chat/core/constant.dart';
-
+import '../../../../core/constant.dart';
 import '../provider/auth_provider.dart';
 import 'hide_item.dart';
 
 class AuthForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
-  final getHeightOfKeyboard;
+  final double Function() getHeightOfKeyboard;
   const AuthForm({
     Key? key,
     required this.formKey,
@@ -138,12 +137,11 @@ class _AuthFormState extends State<AuthForm> {
       },
       onChanged: (value) async {
         if (label == 'E-mail adress') {
-          Constant.heightOfKeyboard =
-              (MediaQuery.of(context).viewInsets.bottom +
-                  MediaQuery.of(context).viewPadding.bottom);
-          print(Constant.heightOfKeyboard);
-          SharedPreferences db = await SharedPreferences.getInstance();
-          db.setDouble('heightOfKeyBoard', Constant.heightOfKeyboard);
+          if (Constant.heightOfKeyboard == 0) {
+            Constant.heightOfKeyboard = widget.getHeightOfKeyboard();
+            SharedPreferences db = await SharedPreferences.getInstance();
+            db.setDouble('heightOfKeyBoard', Constant.heightOfKeyboard);
+          }
         }
         label == 'E-mail adress'
             ? context.read<AuthProvider>().onTextEmailChange(value)

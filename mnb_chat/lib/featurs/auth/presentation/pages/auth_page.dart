@@ -84,7 +84,10 @@ class AuthPage extends StatelessWidget {
                                     TextStyle(color: Colors.grey.shade600),
                               )),
                           SizedBox(height: heightOfDevice * 0.02),
-                          AuthForm(formKey: formKey,getHeightOfKeyboard: getHeightOfKeyboard(),),
+                          AuthForm(
+                            formKey: formKey,
+                            getHeightOfKeyboard: getHeightOfKeyboard,
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
