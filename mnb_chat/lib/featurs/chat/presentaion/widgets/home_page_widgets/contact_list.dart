@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -80,11 +79,11 @@ class ContactList extends StatelessWidget {
                                               .error,
                                           borderRadius:
                                               BorderRadius.circular(15)),
-                                      child: Text((snapshot1.data?.docs.length)
-                                          .toString(),
-overflow: TextOverflow.ellipsis,
-                                          
-                                          ),
+                                      child: Text(
+                                        (snapshot1.data?.docs.length)
+                                            .toString(),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     )
                                   : const SizedBox.shrink();
                             },
@@ -93,8 +92,22 @@ overflow: TextOverflow.ellipsis,
                     onTap: () {
                       onTabFreinTile(snapshot, index);
                     },
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.pinkAccent[100],
+                    leading: Container(
+                      alignment: Alignment.center,
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                          color: Constant.nameColors[getNameLetters(snapshot
+                                  .data!.docs[index]
+                                  .data()['name'])[0]] ??
+                              Colors.cyan,
+                          shape: BoxShape.circle),
+                      child: Text(
+                        getNameLetters(
+                            snapshot.data!.docs[index].data()['name']),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
                     ),
                     tileColor: context.watch<HomeProvider>().themeMode ==
                             ThemeMode.dark
@@ -102,8 +115,7 @@ overflow: TextOverflow.ellipsis,
                         : Colors.white,
                     title: Text(
                       snapshot.data!.docs[index].data()['name'],
-overflow: TextOverflow.ellipsis,
-
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: Theme.of(context).textTheme.titleLarge!.color,
                           fontWeight: FontWeight.bold,
@@ -112,9 +124,18 @@ overflow: TextOverflow.ellipsis,
                   ),
                 ),
               )
-            : const Text('please wait',
-overflow: TextOverflow.ellipsis,
-            
-            ));
+            : const Text(
+                'please wait',
+                overflow: TextOverflow.ellipsis,
+              ));
+  }
+
+  String getNameLetters(String name) {
+    var splitedName = name.split(' ');
+    var f = splitedName.length == 1
+        ? splitedName.first.characters.first
+        : splitedName.first.characters.first +
+            splitedName.last.characters.first;
+    return f.toUpperCase();
   }
 }

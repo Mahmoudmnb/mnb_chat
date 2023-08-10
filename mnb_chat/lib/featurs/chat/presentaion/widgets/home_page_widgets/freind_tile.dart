@@ -1,23 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:mnb_chat/featurs/chat/presentaion/providers/home_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../core/constant.dart';
 import '../../../../auth/models/user_model.dart';
 import '../../pages/chat_page.dart';
 import '../../providers/chat_provider.dart';
+import '../../providers/home_provider.dart';
 
 class FriendTile extends StatelessWidget {
   final AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot;
   final int index;
   final String currentFriendNum;
+  final String nameLetters;
 
   const FriendTile(
       {Key? key,
       required this.snapshot,
       required this.index,
-      required this.currentFriendNum})
+      required this.currentFriendNum,
+      required this.nameLetters})
       : super(key: key);
 
   @override
@@ -80,9 +82,9 @@ class FriendTile extends StatelessWidget {
                         decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.error,
                             borderRadius: BorderRadius.circular(15)),
-                        child: Text((snapshot1.data?.docs.length).toString(),
-overflow: TextOverflow.ellipsis,
-                        
+                        child: Text(
+                          (snapshot1.data?.docs.length).toString(),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       )
                     : const SizedBox.shrink();
@@ -90,16 +92,24 @@ overflow: TextOverflow.ellipsis,
             )
           : const SizedBox.shrink(),
       onTap: onTabFreinTile,
-      leading: CircleAvatar(
-        backgroundColor: Colors.pinkAccent[100],
+      leading: Container(
+        alignment: Alignment.center,
+        height: 50,
+        width: 50,
+        decoration: BoxDecoration(
+            color: Constant.nameColors[nameLetters[0]] ?? Colors.cyan,
+            shape: BoxShape.circle),
+        child: Text(
+          nameLetters,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
       ),
       tileColor: context.watch<HomeProvider>().themeMode == ThemeMode.dark
           ? Colors.grey.shade900
           : Colors.white,
       title: Text(
         snapshot.data!.docs[index].data()['toName'].toString(),
-overflow: TextOverflow.ellipsis,
-
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
             color: Theme.of(context).textTheme.titleLarge!.color,
             fontWeight: FontWeight.bold,

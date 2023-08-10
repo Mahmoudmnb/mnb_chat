@@ -32,15 +32,19 @@ class FriendList extends StatelessWidget {
                           padding: const EdgeInsets.only(
                               top: 10, left: 10, right: 10),
                           child: FriendTile(
+                              nameLetters: getNameLetters(
+                                  snapshot.data!.docs[index].data()['toName']),
                               snapshot: snapshot,
                               index: index,
                               currentFriendNum: currentFriendNum));
                     },
                   );
                 } else {
-                  return const Text('please  wait',
-overflow: TextOverflow.ellipsis,
-                  
+                  return const Center(
+                    child: Text(
+                      'please  wait',
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   );
                 }
               }),
@@ -48,4 +52,12 @@ overflow: TextOverflow.ellipsis,
       ),
     );
   }
+}
+
+String getNameLetters(String name) {
+  var splitedName = name.split(' ');
+  var f = splitedName.length == 1
+      ? splitedName.first.characters.first
+      : splitedName.first.characters.first + splitedName.last.characters.first;
+  return f.toUpperCase();
 }

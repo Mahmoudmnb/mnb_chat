@@ -21,6 +21,15 @@ import 'home_provider.dart';
 
 class ChatProvider extends ChangeNotifier {
 //!                     **********************************       variabels      ***************************************************
+  PageController pageController = PageController();
+  //* this is for selected page
+  int _selectedPage = 0;
+  get selectedPage => _selectedPage;
+  set setSelectedPage(index) {
+    _selectedPage = index;
+    notifyListeners();
+  }
+
   //* this is an opject of the user whom i'm chatting with him
   UserModel? friend;
 

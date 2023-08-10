@@ -10,6 +10,34 @@ class Constant {
       UserModel(token: '', name: '', email: '', password: '');
   static Directory? appPath;
   static double heightOfKeyboard = 0;
+  static final Map<String, Color> nameColors = {
+    'A': Colors.redAccent,
+    'B': Colors.orangeAccent,
+    'C': Colors.pinkAccent,
+    'D': Colors.yellowAccent,
+    'E': Colors.greenAccent,
+    'F': Colors.blueAccent,
+    'G': Colors.purpleAccent,
+    'H': Colors.lightBlueAccent,
+    'I': Colors.lightGreenAccent,
+    'J': Colors.teal,
+    'k': Colors.tealAccent,
+    'L': Colors.amberAccent,
+    'M': Colors.indigo,
+    'N': Colors.indigoAccent,
+    'O': Colors.limeAccent,
+    'P': Colors.deepPurpleAccent,
+    'Q': Colors.cyan,
+    'R': Colors.cyanAccent,
+    'S': Colors.red[200]!,
+    'T': Colors.pink[300]!,
+    'U': Colors.red[50]!,
+    'V': Colors.purple[200]!,
+    'W': Colors.green[200]!,
+    'X': Colors.teal[300]!,
+    'Y': Colors.deepOrange[300]!,
+    'Z': Colors.pink[200]!
+  };
   //! chat page colors
   static Color chatBackgroundColor = const Color.fromRGBO(221, 231, 227, 1);
   static Color appBarColor = const Color.fromRGBO(248, 248, 248, 1);
@@ -44,6 +72,7 @@ class Constant {
   static Color dTextInputColor = const Color.fromRGBO(29, 29, 29, 1);
 
   static ThemeData lightTheme = ThemeData(
+      scaffoldBackgroundColor: Colors.white,
       textTheme: const TextTheme(titleLarge: TextStyle(color: Colors.black)),
       colorScheme: ColorScheme(
           brightness: Brightness.light,
@@ -60,6 +89,7 @@ class Constant {
           surfaceTint: textInputColor,
           onSurface: inputBottomColor));
   static ThemeData darkTheme = ThemeData(
+      scaffoldBackgroundColor: Colors.black,
       textTheme: const TextTheme(titleLarge: TextStyle(color: Colors.white)),
       colorScheme: ColorScheme(
           brightness: Brightness.light,

@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,6 +11,7 @@ import '../../../../core/constant.dart';
 import '../../../auth/models/user_model.dart';
 import '../providers/chat_provider.dart';
 import '../providers/home_provider.dart';
+import '../widgets/chat_page_widgets/bottom_navigation.dart';
 import '../widgets/home_page_widgets/home_page_widgets.dart';
 import '../widgets/home_page_widgets/profile_page.dart';
 import 'chat_page.dart';
@@ -27,10 +27,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   String currentFriendNum = '';
-  late TabController tabController;
+  late PageController pageController;
   @override
   void initState() {
-    tabController = TabController(length: 3, vsync: this);
+    pageController = PageController();
 
     getPermision();
     initInfo();
@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage>
 
   @override
   void dispose() {
-    tabController.dispose();
+    pageController.dispose();
     super.dispose();
   }
 
@@ -99,34 +99,26 @@ class _HomePageState extends State<HomePage>
           icon: const Icon(Icons.arrow_back)),
     );
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: !context.watch<ChatProvider>().isConvertedMode
-          ? mainAppBar
-          : alternativeAppBar,
-      body: TabBarView(controller: tabController, children: [
-        FriendList(
-            deviceHeight: deviceHeight,
-            data: data,
-            currentFriendNum: currentFriendNum),
-        ContactList(currentFriendNum: currentFriendNum),
-        const ProfilePage()
-      ]),
-      //! change it to bottom navigation bar
-      bottomNavigationBar: Container(
-        height: deviceHeight * 0.1,
-        alignment: Alignment.center,
-        width: double.infinity,
-        color: Theme.of(context).colorScheme.surface,
-        child: TabBar(
-            indicatorColor: Theme.of(context).colorScheme.error,
-            controller: tabController,
-            tabs: [
-              buildTabsIcon('Chats'),
-              buildTabsIcon('People'),
-              buildTabsIcon('profile'),
+        backgroundColor: Theme.of(context).colorScheme.background,
+        appBar: !context.watch<ChatProvider>().isConvertedMode
+            ? mainAppBar
+            : alternativeAppBar,
+        body: PageView(
+            onPageChanged: (value) {
+              context.read<ChatProvider>().setSelectedPage = value;
+            },
+            controller: context.watch<ChatProvider>().pageController,
+            children: [
+              FriendList(
+                  deviceHeight: deviceHeight,
+                  data: data,
+                  currentFriendNum: currentFriendNum),
+              ContactList(currentFriendNum: currentFriendNum),
+              const ProfilePage(),
             ]),
-      ),
-    );
+        bottomNavigationBar: BottomNavigation(
+          pageController: pageController,
+        ));
   }
 
   void initInfo() {
@@ -211,30 +203,5 @@ class _HomePageState extends State<HomePage>
       sound: true,
     );
     print('User granted permission: ${settings.authorizationStatus}');
-  }
-
-  Widget buildTabsIcon(String text) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(height: 10),
-        Icon(
-          text == 'People'
-              ? Icons.group
-              : text == 'Chats'
-                  ? MdiIcons.chat
-                  : MdiIcons.faceManProfile,
-          size: MediaQuery.of(context).size.width * 0.06,
-          color: Theme.of(context).colorScheme.error,
-        ),
-        Text(
-          text,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.titleLarge!.color),
-        )
-      ],
-    );
   }
 }
