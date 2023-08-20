@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -69,12 +71,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       shape: BoxShape.circle),
                   child: isLoding
                       ? const CircularProgressIndicator()
-                      : Text(
-                          getNameLetters(Constant.currentUsre.name),
-                          style: TextStyle(
-                              fontSize: deviceWidth * 0.08,
-                              fontWeight: FontWeight.bold),
-                        ),
+                      : Constant.currentUsre.imgUrl == '' ||
+                              Constant.currentUsre.imgUrl == null
+                          ? Text(
+                              getNameLetters(Constant.currentUsre.name),
+                              style: TextStyle(
+                                  fontSize: deviceWidth * 0.08,
+                                  fontWeight: FontWeight.bold),
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(500),
+                              child: CachedNetworkImage(
+                                  imageUrl: Constant.currentUsre.imgUrl!),
+                            ),
                 ),
                 const SizedBox(height: 20),
                 Text(
@@ -152,7 +161,11 @@ class _ProfilePageState extends State<ProfilePage> {
               .collection('users')
               .doc(Constant.currentUsre.email)
               .update({'ImgUrl': await event.ref.getDownloadURL()}).then(
-                  (value) {
+                  (value) async {
+            Constant.currentUsre.imgUrl = await event.ref.getDownloadURL();
+            SharedPreferences db = await SharedPreferences.getInstance();
+            db.setString(
+                'currentUser', jsonEncode(Constant.currentUsre.toJson()));
             isLoding = false;
             setState(() {});
             Toast.show('Image uploaded');

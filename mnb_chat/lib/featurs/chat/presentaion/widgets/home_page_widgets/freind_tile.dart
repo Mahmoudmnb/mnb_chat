@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,14 +15,25 @@ class FriendTile extends StatelessWidget {
   final int index;
   final String currentFriendNum;
   final String nameLetters;
-
-  const FriendTile(
+  final String friendEmail;
+  String? imgUrl;
+  FriendTile(
       {Key? key,
       required this.snapshot,
       required this.index,
       required this.currentFriendNum,
-      required this.nameLetters})
-      : super(key: key);
+      required this.nameLetters,
+      required this.friendEmail})
+      : super(key: key) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(friendEmail)
+        .get()
+        .then((value) {
+      imgUrl = value.data()!['ImgUrl'];
+      print(imgUrl);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,10 +113,16 @@ class FriendTile extends StatelessWidget {
         decoration: BoxDecoration(
             color: AppTheme.nameColors[nameLetters[0]] ?? Colors.cyan,
             shape: BoxShape.circle),
-        child: Text(
-          nameLetters,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-        ),
+        child: imgUrl == '' || imgUrl == null
+            ? Text(
+                nameLetters,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              )
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(500),
+                child: CachedNetworkImage(imageUrl: imgUrl!),
+              ),
       ),
       tileColor: Theme.of(context).colorScheme.onBackground,
       title: Text(
