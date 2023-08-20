@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mnb_chat/core/app_theme.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -16,8 +17,7 @@ import 'featurs/Auth/presentation/pages/auth_page.dart';
 import 'featurs/Auth/presentation/provider/auth_provider.dart';
 import 'featurs/auth/models/user_model.dart';
 import 'featurs/chat/presentaion/pages/home_page.dart';
-import 'featurs/chat/presentaion/providers/chat_provider.dart';
-import 'featurs/chat/presentaion/providers/home_provider.dart';
+import 'featurs/chat/presentaion/providers/providers.dart';
 import 'firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -75,8 +75,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: Constant.lightTheme,
-      darkTheme: Constant.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       themeMode: context.watch<HomeProvider>().themeMode,
       debugShowCheckedModeBanner: false,
       home: FutureBuilder(
@@ -100,4 +100,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-//! try animated switcher

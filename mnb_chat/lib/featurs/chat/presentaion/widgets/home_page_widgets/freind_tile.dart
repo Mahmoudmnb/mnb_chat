@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../core/app_theme.dart';
 import '../../../../../core/constant.dart';
 import '../../../../auth/models/user_model.dart';
 import '../../pages/chat_page.dart';
@@ -46,6 +47,7 @@ class FriendTile extends StatelessWidget {
               : snapshot.data!.docs[index].data()['to'],
         };
         chatReadContext.friend = UserModel.fromJson(map);
+        //! I edited som codes here in createChat
         String chatId = await chatReadContext.createChat();
         homeReadContext.setCurrentFriendNum = map['email'];
         Navigator.of(context)
@@ -62,7 +64,7 @@ class FriendTile extends StatelessWidget {
 
     return ListTile(
       shape: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(10),
           borderSide:
               BorderSide(color: Theme.of(context).colorScheme.background)),
       trailing: snapshot.data!.docs.isNotEmpty
@@ -78,9 +80,9 @@ class FriendTile extends StatelessWidget {
                 return snapshot1.data != null && snapshot1.data!.docs.isNotEmpty
                     ? Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 5),
+                            horizontal: 10, vertical: 2),
                         decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.error,
+                            color: Theme.of(context).colorScheme.background,
                             borderRadius: BorderRadius.circular(15)),
                         child: Text(
                           (snapshot1.data?.docs.length).toString(),
@@ -97,16 +99,14 @@ class FriendTile extends StatelessWidget {
         height: 50,
         width: 50,
         decoration: BoxDecoration(
-            color: Constant.nameColors[nameLetters[0]] ?? Colors.cyan,
+            color: AppTheme.nameColors[nameLetters[0]] ?? Colors.cyan,
             shape: BoxShape.circle),
         child: Text(
           nameLetters,
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
-      tileColor: context.watch<HomeProvider>().themeMode == ThemeMode.dark
-          ? Colors.grey.shade900
-          : Colors.white,
+      tileColor: Theme.of(context).colorScheme.onBackground,
       title: Text(
         snapshot.data!.docs[index].data()['toName'].toString(),
         overflow: TextOverflow.ellipsis,

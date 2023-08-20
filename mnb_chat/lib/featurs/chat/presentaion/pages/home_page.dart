@@ -9,11 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../core/constant.dart';
 import '../../../auth/models/user_model.dart';
-import '../providers/chat_provider.dart';
-import '../providers/home_provider.dart';
+import '../providers/providers.dart';
 import '../widgets/chat_page_widgets/bottom_navigation.dart';
 import '../widgets/home_page_widgets/home_page_widgets.dart';
-import '../widgets/home_page_widgets/profile_page.dart';
 import 'chat_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -31,7 +29,6 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     pageController = PageController();
-
     getPermision();
     initInfo();
     super.initState();
@@ -45,6 +42,7 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
+    //* this is to get the real hight of the screen without the padding
     double deviceHeight = MediaQuery.of(context).size.height -
         (MediaQuery.of(context).padding.top +
             MediaQuery.of(context).padding.bottom);
@@ -56,14 +54,17 @@ class _HomePageState extends State<HomePage>
         .snapshots(includeMetadataChanges: true);
     var mainAppBar = AppBar(
       centerTitle: true,
-      foregroundColor: Theme.of(context).colorScheme.error,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      foregroundColor: Theme.of(context).colorScheme.onError,
+      backgroundColor: Theme.of(context).colorScheme.background,
       elevation: 0,
       title: Text(
         'MNB CHAT',
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
-        style: TextStyle(color: Theme.of(context).textTheme.titleLarge!.color),
+        style: TextStyle(
+            color: Theme.of(context).textTheme.titleLarge!.color,
+            fontSize: deviceHeight * 0.04,
+            fontWeight: FontWeight.bold),
       ),
       actions: [
         IconButton(
@@ -85,12 +86,14 @@ class _HomePageState extends State<HomePage>
     );
     var alternativeAppBar = AppBar(
       centerTitle: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: Theme.of(context).colorScheme.background,
       elevation: 0,
       title: Text(
-        'convert to ...',
+        'Convert to ...',
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(color: Theme.of(context).textTheme.titleLarge!.color),
+        style: TextStyle(
+            color: Theme.of(context).textTheme.titleLarge!.color,
+            fontSize: deviceHeight * 0.05),
       ),
       leading: IconButton(
           onPressed: () {

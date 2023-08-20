@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-import 'package:mnb_chat/featurs/chat/presentaion/providers/home_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 
 import '../../../../auth/models/user_model.dart';
 import '../../providers/chat_provider.dart';
+import '../../providers/home_provider.dart';
 
 class InputBottom extends StatefulWidget {
   final String chatId;
@@ -27,7 +28,7 @@ class _InputBottomState extends State<InputBottom> {
   FlutterSoundRecorder recorder = FlutterSoundRecorder();
   String nameOfVoice = '';
   Duration durationOfVoice = Duration.zero;
-  Color colorOfMicIcon = const Color.fromRGBO(227, 152, 1, 1);
+  bool isRecording = false;
   @override
   void initState() {
     recorder.openRecorder();
@@ -41,7 +42,7 @@ class _InputBottomState extends State<InputBottom> {
     Size deviceSize = MediaQuery.of(context).size;
     return Container(
       width: double.infinity,
-      color: Theme.of(context).colorScheme.surface,
+      color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.5),
       child: Column(
         children: [
           context.watch<ChatProvider>().isReplied
@@ -53,7 +54,7 @@ class _InputBottomState extends State<InputBottom> {
                       const SizedBox(width: 5),
                       Icon(
                         Icons.arrow_forward_ios,
-                        color: Theme.of(context).colorScheme.error,
+                        color: Theme.of(context).colorScheme.surface,
                         size: deviceSize.width * 0.06,
                       ),
                       const SizedBox(width: 15),
@@ -93,7 +94,7 @@ class _InputBottomState extends State<InputBottom> {
                           },
                           icon: Icon(
                             Icons.cancel,
-                            color: Theme.of(context).colorScheme.error,
+                            color: Theme.of(context).colorScheme.surface,
                             size: deviceSize.width * 0.07,
                           )),
                       const Divider(),
@@ -109,7 +110,7 @@ class _InputBottomState extends State<InputBottom> {
                   context.watch<ChatProvider>().showImojiPicker
                       ? Icons.keyboard
                       : Icons.face,
-                  color: Theme.of(context).colorScheme.error,
+                  color: Theme.of(context).colorScheme.surface,
                 )),
             Container(
               constraints: const BoxConstraints(maxHeight: 100),
@@ -120,7 +121,10 @@ class _InputBottomState extends State<InputBottom> {
               decoration: BoxDecoration(
                   boxShadow: [
                     BoxShadow(
-                        color: Theme.of(context).colorScheme.surfaceTint,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onBackground
+                            .withOpacity(0.5),
                         offset: const Offset(1, 1)),
                   ],
                   borderRadius: BorderRadius.circular(15),
@@ -173,10 +177,9 @@ class _InputBottomState extends State<InputBottom> {
                       context.watch<ChatProvider>().editMode
                           ? Icons.edit
                           : Icons.send,
-                      color: Theme.of(context).colorScheme.error,
+                      color: Theme.of(context).colorScheme.surface,
                     ))
                 : Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                           onPressed: () async {
@@ -190,7 +193,7 @@ class _InputBottomState extends State<InputBottom> {
                           },
                           icon: Icon(
                             Icons.camera_alt,
-                            color: Theme.of(context).colorScheme.error,
+                            color: Theme.of(context).colorScheme.surface,
                           )),
                       Column(
                         children: [
@@ -215,8 +218,7 @@ class _InputBottomState extends State<InputBottom> {
                           InkWell(
                               onTap: () async {
                                 if (recorder.isRecording) {
-                                  colorOfMicIcon =
-                                      Theme.of(context).colorScheme.error;
+                                  isRecording = false;
                                   setState(() {});
                                   var path = await recorder.stopRecorder();
                                   var voice = File(path!);
@@ -225,27 +227,43 @@ class _InputBottomState extends State<InputBottom> {
                                       nameOfVoice,
                                       '${durationOfVoice.inHours}:${durationOfVoice.inMinutes}:${durationOfVoice.inSeconds}',
                                       widget.chatId);
-                                  setState(() {});
                                 } else {
                                   Toast.show('Long press to record');
                                 }
+                                setState(() {});
                               },
                               onLongPress: () {
                                 setState(() {
-                                  colorOfMicIcon = Colors.red;
+                                  isRecording = true;
                                 });
                                 nameOfVoice =
                                     context.read<ChatProvider>().generateId();
                                 recorder.openRecorder();
                                 recorder.startRecorder(toFile: nameOfVoice);
+                                durationOfVoice = Duration.zero;
                               },
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                child: Icon(
-                                  Icons.mic,
-                                  color: colorOfMicIcon,
-                                ),
-                              )),
+                              child: isRecording
+                                  ? AvatarGlow(
+                                      endRadius: 20,
+                                      duration:
+                                          const Duration(milliseconds: 1000),
+                                      glowColor:
+                                          const Color.fromARGB(255, 255, 0, 0),
+                                      child: Icon(
+                                        Icons.mic,
+                                        color:
+                                            Theme.of(context).colorScheme.error,
+                                      ),
+                                    )
+                                  : Container(
+                                      padding: const EdgeInsets.all(10),
+                                      child: Icon(
+                                        Icons.mic,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surface,
+                                      ),
+                                    )),
                         ],
                       )
                     ],

@@ -189,15 +189,12 @@ class ChatProvider extends ChangeNotifier {
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
-                backgroundColor:
-                    context.watch<HomeProvider>().themeMode == ThemeData.light()
-                        ? Colors.black
-                        : Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.onSecondary,
                 title: Text(
                   'Delete message',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontSize: widthOfDevice * 0.08,
+                    fontSize: widthOfDevice * 0.06,
                     color: context.watch<HomeProvider>().themeMode ==
                             ThemeData.light()
                         ? Colors.white
@@ -212,7 +209,8 @@ class ChatProvider extends ChangeNotifier {
                         builder: (context, setState) => Row(
                           children: [
                             Checkbox(
-                              activeColor: Theme.of(context).colorScheme.error,
+                              activeColor:
+                                  Theme.of(context).colorScheme.surface,
                               value: checkBoxKey,
                               onChanged: (value) {
                                 setState(
@@ -224,7 +222,7 @@ class ChatProvider extends ChangeNotifier {
                               'delete also from ${friend!.name} ?',
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: widthOfDevice * 0.04,
+                                fontSize: widthOfDevice * 0.03,
                                 color:
                                     context.watch<HomeProvider>().themeMode ==
                                             ThemeData.light()
@@ -590,28 +588,29 @@ class ChatProvider extends ChangeNotifier {
       } else {
         chatId = second.docs.first.id;
       }
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(Constant.currentUsre.email)
-          .collection('friends')
-          .doc(friend!.email)
-          .set({
-        'to': friend!.email,
-        'toToken': friend!.token,
-        'toName': friend!.name,
-        'chatId': chatId,
-      });
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(friend!.email)
-          .collection('friends')
-          .doc(Constant.currentUsre.email)
-          .set({
-        'to': Constant.currentUsre.email,
-        'toToken': Constant.currentUsre.token,
-        'toName': Constant.currentUsre.name,
-        'chatId': chatId
-      });
+      //! I connented some data here
+      // FirebaseFirestore.instance
+      //     .collection('users')
+      //     .doc(Constant.currentUsre.email)
+      //     .collection('friends')
+      //     .doc(friend!.email)
+      //     .set({
+      //   'to': friend!.email,
+      //   'toToken': friend!.token,
+      //   'toName': friend!.name,
+      //   'chatId': chatId,
+      // });
+      // FirebaseFirestore.instance
+      //     .collection('users')
+      //     .doc(friend!.email)
+      //     .collection('friends')
+      //     .doc(Constant.currentUsre.email)
+      //     .set({
+      //   'to': Constant.currentUsre.email,
+      //   'toToken': Constant.currentUsre.token,
+      //   'toName': Constant.currentUsre.name,
+      //   'chatId': chatId
+      // });
       return chatId;
     }
   }

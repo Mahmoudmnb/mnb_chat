@@ -58,7 +58,7 @@ class RepliedMessagePop extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: isme
-                      ? Theme.of(context).colorScheme.onPrimary
+                      ? Theme.of(context).colorScheme.background
                       : Theme.of(context).colorScheme.onSecondary,
                 ),
                 child: Column(

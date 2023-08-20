@@ -154,12 +154,9 @@ class AuthProvider extends ChangeNotifier {
           Toast.show('No user found for that email.', duration: 2);
         } else if (e.code == 'wrong-password') {
           Toast.show('Wrong password provided for that user.', duration: 2);
-        } else {
-          print(e.code);
-        }
+        } else {}
         isError = true;
       } catch (e) {
-        print(e);
         isError = true;
       }
       if (!isError) {
@@ -269,7 +266,7 @@ class AuthProvider extends ChangeNotifier {
     if (isConnected) {
       try {
         await FirebaseAuth.instance.sendPasswordResetEmail(email: email).then(
-            (value) => Toast.show('check your box email to reset password'));
+            (value) => Toast.show('check your email box to reset password'));
       } on FirebaseAuthException catch (e) {
         if (e.code == 'invalid-email') {
           Toast.show(' invalid-email', duration: 2);

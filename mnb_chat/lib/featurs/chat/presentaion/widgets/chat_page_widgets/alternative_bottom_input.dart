@@ -17,7 +17,8 @@ class AlternativeBottomInput extends StatelessWidget {
       height: deviceHeight * 0.06,
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface),
+      decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.5)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -43,8 +44,11 @@ class AlternativeBottomInput extends StatelessWidget {
                         fontSize: 20,
                         color: Theme.of(context).textTheme.titleLarge!.color),
                   ),
-                  icon: Icon(Icons.arrow_back,
-                      color: Theme.of(context).textTheme.titleLarge!.color))
+                  icon: Padding(
+                    padding: const EdgeInsets.only(right: 5),
+                    child: Icon(Icons.arrow_back,
+                        color: Theme.of(context).textTheme.titleLarge!.color),
+                  ))
               : const SizedBox.shrink(),
           InkWell(
               onTap: () {
@@ -61,8 +65,11 @@ class AlternativeBottomInput extends StatelessWidget {
                         color: Theme.of(context).textTheme.titleLarge!.color),
                   ),
                   const SizedBox(width: 5),
-                  Icon(Icons.arrow_forward,
-                      color: Theme.of(context).textTheme.titleLarge!.color)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 5),
+                    child: Icon(Icons.arrow_forward,
+                        color: Theme.of(context).textTheme.titleLarge!.color),
+                  )
                 ],
               )),
         ],

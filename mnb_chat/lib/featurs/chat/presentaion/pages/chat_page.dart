@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mnb_chat/core/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,6 +9,7 @@ import '../../../auth/models/user_model.dart';
 import '../../models/message.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/chat_page_widgets/chat_page_widgets.dart';
+import 'loading_page.dart';
 
 class ChatePage extends StatefulWidget {
   final UserModel friend;
@@ -128,11 +130,11 @@ class _ChatePageState extends State<ChatePage> {
                           },
                         );
                       } else {
-                        return const Text(
-                          'loading',
-                          overflow: TextOverflow.ellipsis,
+                        return Center(
+                          child: LoadingPage(
+                              fullWidth: false,
+                              deviceSize: MediaQuery.of(context).size),
                         );
-                        //! convert to animated loading widget
                       }
                     },
                   )),
@@ -148,22 +150,23 @@ class _ChatePageState extends State<ChatePage> {
 
   AppBar mainAppBar(String name) => AppBar(
         elevation: 0,
-        foregroundColor: Theme.of(context).colorScheme.error,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor:
+            Theme.of(context).colorScheme.onPrimary.withOpacity(0.5),
         leadingWidth: deviceWidth * 0.1,
         actions: [
           PopupMenuButton(
-            color: Theme.of(context).colorScheme.surface,
+            color: Theme.of(context).colorScheme.background.withOpacity(0.9),
             icon: Icon(
               Icons.more_vert,
-              color: Theme.of(context).colorScheme.error,
+              color: Theme.of(context).colorScheme.surface,
             ),
             itemBuilder: (context) => [
               PopupMenuItem(
                   child: TextButton(
                       onPressed: () async {},
                       child: Text(
-                        'choose an image for background',
+                        'Choose an image for background',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: deviceWidth * 0.035,
@@ -187,8 +190,12 @@ class _ChatePageState extends State<ChatePage> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundColor:
-                  Theme.of(context).colorScheme.error.withOpacity(0.3),
+              backgroundColor: AppTheme.nameColors[getNameLetters(name)[0]],
+              child: Text(
+                getNameLetters(name),
+                style: const TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold),
+              ),
             ),
             SizedBox(width: deviceWidth * 0.03),
             SizedBox(
@@ -196,8 +203,9 @@ class _ChatePageState extends State<ChatePage> {
               child: Text(
                 name,
                 style: TextStyle(
-                    fontSize: deviceWidth * 0.07,
+                    fontSize: deviceWidth * 0.05,
                     overflow: TextOverflow.ellipsis,
+                    fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.titleLarge!.color),
               ),
             ),
@@ -207,8 +215,9 @@ class _ChatePageState extends State<ChatePage> {
 
   AppBar aternativeAppBar() => AppBar(
         elevation: 0,
-        foregroundColor: Theme.of(context).colorScheme.error,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        foregroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor:
+            Theme.of(context).colorScheme.onPrimary.withOpacity(0.5),
         leading: IconButton(
             onPressed: () => readContext.cancelOnTab(),
             icon: const Icon(Icons.cancel)),
@@ -241,4 +250,12 @@ class _ChatePageState extends State<ChatePage> {
               icon: const Icon(Icons.delete)),
         ],
       );
+  String getNameLetters(String name) {
+    var splitedName = name.split(' ');
+    var f = splitedName.length == 1
+        ? splitedName.first.characters.first
+        : splitedName.first.characters.first +
+            splitedName.last.characters.first;
+    return f.toUpperCase();
+  }
 }

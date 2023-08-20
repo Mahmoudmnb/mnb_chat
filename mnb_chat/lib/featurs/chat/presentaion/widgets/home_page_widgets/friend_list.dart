@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mnb_chat/featurs/chat/presentaion/pages/loading_page.dart';
 
 import 'freind_tile.dart';
 
@@ -29,8 +30,8 @@ class FriendList extends StatelessWidget {
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       return Padding(
-                          padding: const EdgeInsets.only(
-                              top: 10, left: 10, right: 10),
+                          padding:
+                              const EdgeInsets.only(top: 2, left: 2, right: 2),
                           child: FriendTile(
                               nameLetters: getNameLetters(
                                   snapshot.data!.docs[index].data()['toName']),
@@ -40,11 +41,10 @@ class FriendList extends StatelessWidget {
                     },
                   );
                 } else {
-                  return const Center(
-                    child: Text(
-                      'please  wait',
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                  return Center(
+                    child: LoadingPage(
+                      fullWidth: true,
+                      deviceSize: MediaQuery.of(context).size),
                   );
                 }
               }),

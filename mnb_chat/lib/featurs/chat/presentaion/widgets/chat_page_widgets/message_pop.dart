@@ -47,7 +47,7 @@ class MessagePop extends StatelessWidget {
       decoration: BoxDecoration(
           color: isme
               ? Theme.of(context).colorScheme.onBackground
-              : Theme.of(context).colorScheme.secondary,
+              : Theme.of(context).colorScheme.onSurface,
           borderRadius: BorderRadius.only(
               topRight: const Radius.circular(15),
               bottomLeft: Radius.circular(isme ? 15 : 0),

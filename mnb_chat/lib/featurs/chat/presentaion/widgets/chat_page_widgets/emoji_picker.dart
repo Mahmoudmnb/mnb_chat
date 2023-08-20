@@ -14,14 +14,14 @@ class EmojiPickerBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        (MediaQuery.of(context).padding.top +
-            MediaQuery.of(context).padding.bottom);
+    (MediaQuery.of(context).padding.top +
+        MediaQuery.of(context).padding.bottom);
     return SizedBox(
       height: h,
       child: EmojiPicker(
         textEditingController: context.watch<ChatProvider>().controller,
         config: Config(
-          bgColor: Theme.of(context).colorScheme.onSurface,
+          bgColor: Theme.of(context).colorScheme.background,
           columns: 7,
           buttonMode: ButtonMode.MATERIAL,
         ),

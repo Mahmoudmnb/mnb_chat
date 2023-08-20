@@ -1,8 +1,9 @@
 import 'package:curved_navigation_bar_with_label/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:mnb_chat/featurs/chat/presentaion/providers/chat_provider.dart';
 import 'package:provider/provider.dart';
+
+import '../../providers/chat_provider.dart';
 
 class BottomNavigation extends StatelessWidget {
   final PageController pageController;
@@ -18,12 +19,11 @@ class BottomNavigation extends StatelessWidget {
         onTap: (value) {
           context.read<ChatProvider>().setSelectedPage = value;
           context.read<ChatProvider>().pageController.animateToPage(value,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.linear);
+              duration: const Duration(milliseconds: 50), curve: Curves.linear);
         },
-        backgroundColor: Theme.of(context).colorScheme.onBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface.withOpacity(0.7),
         color: Theme.of(context).textTheme.titleLarge!.color,
-        buttonBackgroundColor: const Color.fromARGB(255, 207, 194, 194),
+        buttonBackgroundColor: Theme.of(context).colorScheme.onBackground,
         items: [
           CurvedNavigationBarItem(
               icon: Icon(

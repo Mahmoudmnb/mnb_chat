@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:mnb_chat/core/app_theme.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../core/constant.dart';
 import '../../../../auth/models/user_model.dart';
 import '../../pages/chat_page.dart';
+import '../../pages/loading_page.dart';
 import '../../providers/chat_provider.dart';
 import '../../providers/home_provider.dart';
 
@@ -50,10 +52,10 @@ class ContactList extends StatelessWidget {
             ? ListView.builder(
                 itemCount: snapshot.data?.docs.length,
                 itemBuilder: (context, index) => Padding(
-                  padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+                  padding: const EdgeInsets.only(top: 2, left: 2, right: 2),
                   child: ListTile(
                     shape: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide(
                             color: Theme.of(context).colorScheme.background)),
                     trailing: snapshot.data!.docs.isNotEmpty
@@ -72,11 +74,11 @@ class ContactList extends StatelessWidget {
                                       snapshot1.data!.docs.isNotEmpty
                                   ? Container(
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 15, vertical: 5),
+                                          horizontal: 10, vertical: 2),
                                       decoration: BoxDecoration(
                                           color: Theme.of(context)
                                               .colorScheme
-                                              .error,
+                                              .background,
                                           borderRadius:
                                               BorderRadius.circular(15)),
                                       child: Text(
@@ -97,7 +99,7 @@ class ContactList extends StatelessWidget {
                       height: 50,
                       width: 50,
                       decoration: BoxDecoration(
-                          color: Constant.nameColors[getNameLetters(snapshot
+                          color: AppTheme.nameColors[getNameLetters(snapshot
                                   .data!.docs[index]
                                   .data()['name'])[0]] ??
                               Colors.cyan,
@@ -109,10 +111,7 @@ class ContactList extends StatelessWidget {
                             fontWeight: FontWeight.bold, fontSize: 20),
                       ),
                     ),
-                    tileColor: context.watch<HomeProvider>().themeMode ==
-                            ThemeMode.dark
-                        ? Colors.grey.shade900
-                        : Colors.white,
+                    tileColor: Theme.of(context).colorScheme.onBackground,
                     title: Text(
                       snapshot.data!.docs[index].data()['name'],
                       overflow: TextOverflow.ellipsis,
@@ -124,9 +123,10 @@ class ContactList extends StatelessWidget {
                   ),
                 ),
               )
-            : const Text(
-                'please wait',
-                overflow: TextOverflow.ellipsis,
+            : Center(
+                child: LoadingPage(
+                  fullWidth: true,
+                  deviceSize: MediaQuery.of(context).size),
               ));
   }
 
