@@ -274,9 +274,17 @@ class _VoicPopState extends State<VoicPop> {
                               const SizedBox(width: 5),
                               widget.isme
                                   ? widget.message.isReseved == true
-                                      ? const Icon(Icons.done_all)
+                                      ? Icon(Icons.done_all,
+                                          color: Theme.of(context)
+                                              .textTheme
+                                              .titleLarge!
+                                              .color)
                                       : widget.message.isSent == true
-                                          ? const Icon(Icons.check)
+                                          ? Icon(Icons.check,
+                                              color: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge!
+                                                  .color)
                                           : const SpinKitCircle(
                                               size: 30,
                                               color: Colors.blueAccent,

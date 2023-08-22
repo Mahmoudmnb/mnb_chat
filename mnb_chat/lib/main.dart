@@ -30,6 +30,9 @@ Future<void> main(List<String> args) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseFirestore.instance.settings = const Settings(
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED, persistenceEnabled: true);
+
   //* his is to know the path of the application to store files
   Constant.appPath = await getApplicationDocumentsDirectory();
   RemoteMessage? initialMessage =
@@ -37,8 +40,7 @@ Future<void> main(List<String> args) async {
   SharedPreferences db = await SharedPreferences.getInstance();
   //* this is to know the height of the keyboard
   Constant.heightOfKeyboard = db.getDouble('heightOfKeyBoard') ?? 0;
-  FirebaseFirestore.instance.settings =
-      const Settings(cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   //* set theme for the app
   String th = db.getString('Theme') ?? '';

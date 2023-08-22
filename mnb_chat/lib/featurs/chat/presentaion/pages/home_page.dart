@@ -11,7 +11,9 @@ import '../../../../core/constant.dart';
 import '../../../auth/models/user_model.dart';
 import '../providers/providers.dart';
 import '../widgets/chat_page_widgets/bottom_navigation.dart';
-import '../widgets/home_page_widgets/home_page_widgets.dart';
+import '../widgets/home_page_widgets/contact_list.dart';
+import '../widgets/home_page_widgets/friend_list.dart';
+import '../widgets/home_page_widgets/profile_page.dart';
 import 'chat_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -25,10 +27,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   String currentFriendNum = '';
-  late PageController pageController;
   @override
   void initState() {
-    pageController = PageController();
+    context.read<ChatProvider>().pageController = PageController();
     getPermision();
     initInfo();
     super.initState();
@@ -36,7 +37,6 @@ class _HomePageState extends State<HomePage>
 
   @override
   void dispose() {
-    pageController.dispose();
     super.dispose();
   }
 
@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage>
               const ProfilePage(),
             ]),
         bottomNavigationBar: BottomNavigation(
-          pageController: pageController,
+          pageController: context.watch<ChatProvider>().pageController,
         ));
   }
 

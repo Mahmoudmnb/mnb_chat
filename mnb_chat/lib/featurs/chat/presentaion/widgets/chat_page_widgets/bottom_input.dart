@@ -137,12 +137,11 @@ class _InputBottomState extends State<InputBottom> {
                 expands: false,
                 onTap: () {
                   if (context
-                      .read<ChatProvider>()
-                      .focusNode
-                      .enclosingScope!
-                      .isFirstFocus) {
-                    context.read<ChatProvider>().setShowImpjiPicker = false;
-                  } else {
+                          .read<ChatProvider>()
+                          .focusNode
+                          .enclosingScope!
+                          .isFirstFocus &&
+                      context.read<ChatProvider>().showImojiPicker == true) {
                     Timer.periodic(const Duration(seconds: 1), (timer) {
                       context.read<ChatProvider>().setShowImpjiPicker = false;
                       timer.cancel();

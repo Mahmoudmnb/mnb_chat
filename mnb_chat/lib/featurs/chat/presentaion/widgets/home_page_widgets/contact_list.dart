@@ -24,6 +24,7 @@ class ContactList extends StatelessWidget {
     Size deviceSize = MediaQuery.of(context).size;
     onTabFreinTile(AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot,
         index) async {
+      print(context.read<HomeProvider>().enableListTile);
       if (context.read<HomeProvider>().enableListTile) {
         context.read<HomeProvider>().setEnableListTile = false;
         UserModel friend =
@@ -31,6 +32,7 @@ class ContactList extends StatelessWidget {
         context.read<ChatProvider>().friend = friend;
         String chatId = await context.read<ChatProvider>().createChat();
         currentFriendNum = friend.email;
+        
         Navigator.of(context)
             .push(MaterialPageRoute(
           builder: (context) => ChatePage(
@@ -48,7 +50,7 @@ class ContactList extends StatelessWidget {
         stream: FirebaseFirestore.instance
             .collection('users')
             .where('email', isNotEqualTo: Constant.currentUsre.email)
-            .snapshots(),
+            .snapshots(includeMetadataChanges: true),
         builder: (context, snapshot) {
           return snapshot.hasData
               ? ListView.builder(
@@ -70,7 +72,7 @@ class ContactList extends StatelessWidget {
                                   .where('to',
                                       isEqualTo: Constant.currentUsre.email)
                                   .where('isReseved', isEqualTo: false)
-                                  .snapshots(),
+                                  .snapshots(includeMetadataChanges: true),
                               builder: (context, snapshot1) {
                                 return snapshot1.data != null &&
                                         snapshot1.data!.docs.isNotEmpty
@@ -96,29 +98,46 @@ class ContactList extends StatelessWidget {
                       onTap: () {
                         onTabFreinTile(snapshot, index);
                       },
-                      leading: Container(
-                        alignment: Alignment.center,
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                            color: AppTheme.nameColors[getNameLetters(snapshot
-                                    .data!.docs[index]
-                                    .data()['name'])[0]] ??
-                                Colors.cyan,
-                            shape: BoxShape.circle),
-                        child: snapshot.data!.docs[0].data()['ImgUrl'] == null
-                            ? Text(
+                      leading: snapshot.data!.docs[index].data()['ImgUrl'] ==
+                                  null ||
+                              snapshot.data!.docs[index].data()['ImgUrl'] == ''
+                          ? Container(
+                              alignment: Alignment.center,
+                              height: 50,
+                              width: 50,
+                              decoration: BoxDecoration(
+                                  color: AppTheme.nameColors[getNameLetters(
+                                          snapshot.data!.docs[index]
+                                              .data()['name'])[0]] ??
+                                      Colors.cyan,
+                                  shape: BoxShape.circle),
+                              child: Text(
                                 getNameLetters(
                                     snapshot.data!.docs[index].data()['name']),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold, fontSize: 20),
-                              )
-                            : ClipRRect(
+                              ))
+                          : SizedBox(
+                              height: 50,
+                              width: 50,
+                              child: ClipRRect(
                                 borderRadius: BorderRadius.circular(500),
                                 child: CachedNetworkImage(
-                                    imageUrl: Constant.currentUsre.imgUrl!),
+                                    errorWidget: (context, url, error) => Text(
+                                          getNameLetters(snapshot
+                                              .data!.docs[index]
+                                              .data()['name']),
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20),
+                                        ),
+                                    progressIndicatorBuilder:
+                                        (context, url, progress) =>
+                                            CircularProgressIndicator(),
+                                    imageUrl: snapshot.data!.docs[index]
+                                        .data()['ImgUrl']!),
                               ),
-                      ),
+                            ),
                       tileColor: Theme.of(context).colorScheme.onBackground,
                       title: Text(
                         snapshot.data!.docs[index].data()['name'],

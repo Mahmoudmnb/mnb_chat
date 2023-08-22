@@ -218,17 +218,37 @@ class ChatProvider extends ChangeNotifier {
                                 );
                               },
                             ),
-                            Text(
-                              'delete also from ${friend!.name} ?',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: widthOfDevice * 0.03,
-                                color:
-                                    context.watch<HomeProvider>().themeMode ==
+                            Column(
+                              children: [
+                                Text(
+                                  'delete also from ',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: widthOfDevice * 0.04,
+                                    fontWeight: FontWeight.bold,
+                                    color: context
+                                                .watch<HomeProvider>()
+                                                .themeMode ==
                                             ThemeData.light()
                                         ? Colors.white
                                         : Colors.black,
-                              ),
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  '${friend!.name} ?',
+                                  style: TextStyle(
+                                    fontSize: widthOfDevice * 0.04,
+                                    fontWeight: FontWeight.bold,
+                                    color: context
+                                                .watch<HomeProvider>()
+                                                .themeMode ==
+                                            ThemeData.light()
+                                        ? Colors.white
+                                        : Colors.black,
+                                  ),
+                                )
+                              ],
                             ),
                           ],
                         ),
@@ -588,29 +608,28 @@ class ChatProvider extends ChangeNotifier {
       } else {
         chatId = second.docs.first.id;
       }
-      //! I connented some data here
-      // FirebaseFirestore.instance
-      //     .collection('users')
-      //     .doc(Constant.currentUsre.email)
-      //     .collection('friends')
-      //     .doc(friend!.email)
-      //     .set({
-      //   'to': friend!.email,
-      //   'toToken': friend!.token,
-      //   'toName': friend!.name,
-      //   'chatId': chatId,
-      // });
-      // FirebaseFirestore.instance
-      //     .collection('users')
-      //     .doc(friend!.email)
-      //     .collection('friends')
-      //     .doc(Constant.currentUsre.email)
-      //     .set({
-      //   'to': Constant.currentUsre.email,
-      //   'toToken': Constant.currentUsre.token,
-      //   'toName': Constant.currentUsre.name,
-      //   'chatId': chatId
-      // });
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(Constant.currentUsre.email)
+          .collection('friends')
+          .doc(friend!.email)
+          .set({
+        'to': friend!.email,
+        'toToken': friend!.token,
+        'toName': friend!.name,
+        'chatId': chatId,
+      });
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(friend!.email)
+          .collection('friends')
+          .doc(Constant.currentUsre.email)
+          .set({
+        'to': Constant.currentUsre.email,
+        'toToken': Constant.currentUsre.token,
+        'toName': Constant.currentUsre.name,
+        'chatId': chatId
+      });
       return chatId;
     }
   }

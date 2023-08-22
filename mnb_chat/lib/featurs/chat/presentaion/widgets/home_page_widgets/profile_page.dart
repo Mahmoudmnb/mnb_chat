@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -7,14 +8,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mnb_chat/core/app_theme.dart';
-import 'package:mnb_chat/core/constant.dart';
-import 'package:mnb_chat/featurs/auth/models/user_model.dart';
-import 'package:mnb_chat/featurs/chat/presentaion/widgets/profile_widgets/list_tile_settting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
+import '../../../../../core/app_theme.dart';
+import '../../../../../core/constant.dart';
+
 import '../../../../Auth/presentation/pages/auth_page.dart';
+import '../../../../auth/models/user_model.dart';
+import '../profile_widgets/list_tile_settting.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -60,31 +62,43 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  alignment: Alignment.center,
-                  height: deviceWidth * 0.3,
-                  width: deviceWidth * 0.3,
-                  decoration: BoxDecoration(
-                      color: AppTheme.nameColors[
-                              getNameLetters(Constant.currentUsre.name)] ??
-                          Theme.of(context).colorScheme.background,
-                      shape: BoxShape.circle),
-                  child: isLoding
-                      ? const CircularProgressIndicator()
-                      : Constant.currentUsre.imgUrl == '' ||
-                              Constant.currentUsre.imgUrl == null
-                          ? Text(
-                              getNameLetters(Constant.currentUsre.name),
-                              style: TextStyle(
-                                  fontSize: deviceWidth * 0.08,
-                                  fontWeight: FontWeight.bold),
-                            )
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(500),
-                              child: CachedNetworkImage(
-                                  imageUrl: Constant.currentUsre.imgUrl!),
-                            ),
-                ),
+                Constant.currentUsre.imgUrl == null ||
+                        Constant.currentUsre.imgUrl == ''
+                    ? Container(
+                        alignment: Alignment.center,
+                        height: deviceWidth * 0.3,
+                        width: deviceWidth * 0.3,
+                        decoration: BoxDecoration(
+                            color: AppTheme.nameColors[getNameLetters(
+                                    Constant.currentUsre.name)] ??
+                                Theme.of(context).colorScheme.background,
+                            shape: BoxShape.circle),
+                        child: isLoding
+                            ? const CircularProgressIndicator()
+                            : Text(
+                                getNameLetters(Constant.currentUsre.name),
+                                style: TextStyle(
+                                    fontSize: deviceWidth * 0.08,
+                                    fontWeight: FontWeight.bold),
+                              ))
+                    : SizedBox(
+                        height: deviceWidth * 0.3,
+                        width: deviceWidth * 0.3,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(500),
+                          child: CachedNetworkImage(
+                              errorWidget: (context, url, error) => Text(
+                                    getNameLetters(Constant.currentUsre.name),
+                                    style: TextStyle(
+                                        fontSize: deviceWidth * 0.08,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                              progressIndicatorBuilder:
+                                  (context, url, progress) =>
+                                      CircularProgressIndicator(),
+                              imageUrl: Constant.currentUsre.imgUrl!),
+                        ),
+                      ),
                 const SizedBox(height: 20),
                 Text(
                   Constant.currentUsre.name,
@@ -141,37 +155,64 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void changeUserImage() async {
-    ToastContext().init(context);
-
-    ImagePicker imagePicker = ImagePicker();
-    var p = await imagePicker.pickImage(source: ImageSource.gallery);
-    if (p != null) {
+    bool isLoading = false;
+    if (!isLoding) {
       isLoding = true;
-      setState(() {});
-      File image = File(p.path);
-
-      FirebaseStorage.instance
-          .ref('profileImages')
-          .child(Constant.currentUsre.email)
-          .putFile(image)
-          .snapshotEvents
-          .listen((event) async {
-        if (event.state == TaskState.success) {
-          await FirebaseFirestore.instance
-              .collection('users')
-              .doc(Constant.currentUsre.email)
-              .update({'ImgUrl': await event.ref.getDownloadURL()}).then(
-                  (value) async {
-            Constant.currentUsre.imgUrl = await event.ref.getDownloadURL();
-            SharedPreferences db = await SharedPreferences.getInstance();
-            db.setString(
-                'currentUser', jsonEncode(Constant.currentUsre.toJson()));
-            isLoding = false;
-            setState(() {});
-            Toast.show('Image uploaded');
-          });
-        }
-      });
+      ToastContext().init(context);
+      ImagePicker imagePicker = ImagePicker();
+      var p = await imagePicker.pickImage(source: ImageSource.gallery);
+      if (p != null) {
+        isLoding = true;
+        setState(() {});
+        File image = File(p.path);
+        FirebaseStorage.instance
+            .ref('profileImages')
+            .child(Constant.currentUsre.email)
+            .putFile(image)
+            .snapshotEvents
+            .listen((event) async {
+          String imgUrl = await event.ref.getDownloadURL();
+          if (event.state == TaskState.success) {
+            await FirebaseFirestore.instance
+                .collection('users')
+                .doc(Constant.currentUsre.email)
+                .update({'ImgUrl': imgUrl}).then((value) async {
+              var s =
+                  FirebaseFirestore.instance.collection('users').snapshots();
+              s.listen((event1) {
+                event1.docs.forEach((element) {
+                  FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(element.id)
+                      .collection('friends')
+                      .snapshots()
+                      .listen((event2) {
+                    event2.docs.forEach((element2) async {
+                      if (element2.id == Constant.currentUsre.email) {
+                        print(element2.id);
+                        FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(element.id)
+                            .collection('friends')
+                            .doc(element2.id)
+                            .update({'toImage': imgUrl});
+                      }
+                    });
+                  });
+                });
+              });
+              Constant.currentUsre.imgUrl = await event.ref.getDownloadURL();
+              SharedPreferences db = await SharedPreferences.getInstance();
+              db.setString(
+                  'currentUser', jsonEncode(Constant.currentUsre.toJson()));
+              isLoding = false;
+              setState(() {});
+              Toast.show('Image uploaded');
+              isLoding = false;
+            });
+          }
+        });
+      }
     }
   }
 
@@ -185,12 +226,51 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   logOut(context) async {
-    SharedPreferences db = await SharedPreferences.getInstance();
-    db.remove('currentUser');
-    Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (context) => AuthPage(),
-    ));
-    await FirebaseAuth.instance.signOut();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.background,
+        title: Text(
+          'Log out',
+          style:
+              TextStyle(color: Theme.of(context).textTheme.titleLarge!.color),
+        ),
+        content: Text(
+          'Are you realy want to log out?',
+          style:
+              TextStyle(color: Theme.of(context).textTheme.titleLarge!.color),
+        ),
+        actions: [
+          TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(true);
+              },
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge!.color),
+              )),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text(
+                'No',
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.titleLarge!.color),
+              ))
+        ],
+      ),
+    ).then((value) async {
+      if (value != null && value == true) {
+        SharedPreferences db = await SharedPreferences.getInstance();
+        db.remove('currentUser');
+        await FirebaseAuth.instance.signOut();
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => AuthPage(),
+        ));
+      }
+    });
   }
 
   changeUserData(BuildContext context, double deviceWidth, double deviceHight) {
@@ -316,6 +396,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                     onPressed: () {
+                      print(Constant.currentUsre.email);
                       isLoding = true;
                       setState(() {});
                       ToastContext().init(context);
@@ -331,8 +412,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         Toast.show('password should be more than six letters',
                             duration: 2);
                       } else {
-                        //! change data of current user
-                        //! modify loading
                         FirebaseFirestore.instance
                             .collection('users')
                             .doc(Constant.currentUsre.email)
@@ -345,14 +424,62 @@ class _ProfilePageState extends State<ProfilePage> {
                           isLoding = false;
                           setState(() {});
                         }).then((value) {
-                          var token = Constant.currentUsre.token;
-                          Constant.currentUsre = UserModel(
-                              password: passCon.text,
-                              name: nameCon.text,
-                              email: emailCon.text,
-                              token: token);
+                          //!jdjlkfjkjdfljdssljflkjldkfjlsdjdsflkjlkadjfoiejfioejlfjdsklfjdsoijfoisdjfj
+                          var s = FirebaseFirestore.instance
+                              .collection('users')
+                              .snapshots();
+                          s.listen((event1) {
+                            event1.docs.forEach((element) {
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(element.id)
+                                  .collection('friends')
+                                  .snapshots()
+                                  .listen((event2) {
+                                event2.docs.forEach((element2) async {
+                                  if (element2.id ==
+                                      Constant.currentUsre.email) {
+                                    FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(element.id)
+                                        .collection('friends')
+                                        .doc(element2.id)
+                                        .get()
+                                        .then((value) {
+                                      var data = value.data();
+                                      data!['toName'] = nameCon.text;
+                                      data['to'] = emailCon.text;
+                                      FirebaseFirestore.instance
+                                          .collection('users')
+                                          .doc(element.id)
+                                          .collection('friends')
+                                          .doc(element2.id)
+                                          .delete()
+                                          .then((value) {
+                                        FirebaseFirestore.instance
+                                            .collection('users')
+                                            .doc(element.id)
+                                            .collection('friends')
+                                            .doc(emailCon.text)
+                                            .set(data);
+                                      });
+
+                                      var token = Constant.currentUsre.token;
+                                      Constant.currentUsre = UserModel(
+                                          password: passCon.text,
+                                          name: nameCon.text,
+                                          email: emailCon.text,
+                                          token: token);
+                                    });
+                                  }
+                                });
+                              });
+                            });
+                          });
+
                           isLoding = false;
                           setState(() {});
+                          Navigator.of(context).pop();
                         });
                       }
                     },

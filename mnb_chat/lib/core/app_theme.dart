@@ -39,7 +39,7 @@ class AppTheme {
           primary: Color(0xff33bbc5),
           onPrimary: Color(0xffC8FFE0),
           secondary: Color(0xff85e5c5),
-          onSecondary: Color(0xff00dfa2),
+          onSecondary: Color.fromARGB(255, 233, 208, 203),
           error: Color(0xffff0060),
           onError: Colors.black54,
           background: Color(0xfffff6f4),

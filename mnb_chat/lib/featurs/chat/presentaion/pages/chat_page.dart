@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mnb_chat/core/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,7 +18,11 @@ import 'loading_page.dart';
 class ChatePage extends StatefulWidget {
   final UserModel friend;
   final String chatId;
-  const ChatePage({required this.chatId, required this.friend, super.key});
+  const ChatePage({
+    required this.chatId,
+    required this.friend,
+    super.key,
+  });
   @override
   State<ChatePage> createState() => _ChatePageState();
 }
@@ -57,93 +65,111 @@ class _ChatePageState extends State<ChatePage> {
     deviceHight = deviceHight = MediaQuery.of(context).size.height -
         (MediaQuery.of(context).padding.top +
             MediaQuery.of(context).padding.bottom);
-    return WillPopScope(
-      onWillPop: () => readContext.willPopScopeOnTab(),
-      child: SafeArea(
-        child: Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.background,
-            bottomNavigationBar: watchContext.showImojiPicker
-                ? EmojiPickerBuilder(h: Constant.heightOfKeyboard)
-                : const SizedBox.shrink(),
-            appBar: watchContext.isMainAppBar
-                ? mainAppBar(friend.name)
-                : aternativeAppBar(),
-            body: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus();
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Expanded(
-                      child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection('messages')
-                        .doc(chatId)
-                        .collection('msg')
-                        .orderBy('date', descending: true)
-                        .withConverter(
-                            fromFirestore: (snapshot, options) =>
-                                MessageModel.fromMap(snapshot.data()!),
-                            toFirestore: (value, options) => value.toMap())
-                        .snapshots(),
-                    builder: (con, snapshot) {
-                      if (snapshot.hasData) {
-                        return ListView.builder(
-                          padding: const EdgeInsets.all(5),
-                          physics: const BouncingScrollPhysics(),
-                          controller: watchContext.scrollController,
-                          reverse: true,
-                          itemCount: snapshot.data!.docs.length,
-                          itemBuilder: (ctx, index) {
-                            context
-                                .read<ChatProvider>()
-                                .selectedMessages
-                                .add(false);
-                            MessageModel message =
-                                snapshot.data!.docs[index].data();
-                            bool isme =
-                                message.from == Constant.currentUsre.email;
-                            return message.deletedFrom ==
-                                    Constant.currentUsre.email
-                                ? const SizedBox.shrink()
-                                : GestureDetector(
-                                    onTap: () {
-                                      readContext.onTabMessage(
-                                          index, isme, message, context);
-                                    },
-                                    onLongPress: () {
-                                      context
-                                          .read<ChatProvider>()
-                                          .onLongPressMessage(
-                                              message,
-                                              isme,
-                                              index,
-                                              snapshot.data!.docs.length);
-                                    },
-                                    child: MessageRow(
-                                        chatId: chatId,
-                                        index: index,
-                                        isme: isme,
-                                        friend: friend,
-                                        message: message));
-                          },
-                        );
-                      } else {
-                        return Center(
-                          child: LoadingPage(
-                              fullWidth: false,
-                              deviceSize: MediaQuery.of(context).size),
-                        );
-                      }
-                    },
-                  )),
-                  !readContext.isMainAppBar && !readContext.editMode
-                      ? const AlternativeBottomInput()
-                      : InputBottom(chatId: chatId, freind: friend),
-                ],
-              ),
-            )),
+    return FutureBuilder(
+      future: SharedPreferences.getInstance(),
+      builder: (context, snapshot) => WillPopScope(
+        onWillPop: () => readContext.willPopScopeOnTab(),
+        child: SafeArea(
+          child: Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.background,
+              bottomNavigationBar: watchContext.showImojiPicker
+                  ? EmojiPickerBuilder(h: Constant.heightOfKeyboard)
+                  : const SizedBox.shrink(),
+              appBar: watchContext.isMainAppBar
+                  ? mainAppBar(friend.name)
+                  : aternativeAppBar(),
+              body: GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                },
+                child: Container(
+                  decoration: snapshot.hasData &&
+                          snapshot.data!.getString('backgroundImages') !=
+                              null &&
+                          jsonDecode(snapshot.data!.getString(
+                                  'backgroundImages')!)[friend.email] !=
+                              null
+                      ? BoxDecoration(
+                          image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: FileImage(File(jsonDecode(snapshot.data!
+                                  .getString(
+                                      'backgroundImages')!)[friend.email]))))
+                      : null,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Expanded(
+                          child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection('messages')
+                            .doc(chatId)
+                            .collection('msg')
+                            .orderBy('date', descending: true)
+                            .withConverter(
+                                fromFirestore: (snapshot, options) =>
+                                    MessageModel.fromMap(snapshot.data()!),
+                                toFirestore: (value, options) => value.toMap())
+                            .snapshots(includeMetadataChanges: true),
+                        builder: (con, snapshot) {
+                          if (snapshot.hasData) {
+                            return ListView.builder(
+                              padding: const EdgeInsets.all(5),
+                              physics: const BouncingScrollPhysics(),
+                              controller: watchContext.scrollController,
+                              reverse: true,
+                              itemCount: snapshot.data!.docs.length,
+                              itemBuilder: (ctx, index) {
+                                context
+                                    .read<ChatProvider>()
+                                    .selectedMessages
+                                    .add(false);
+                                MessageModel message =
+                                    snapshot.data!.docs[index].data();
+                                bool isme =
+                                    message.from == Constant.currentUsre.email;
+                                return message.deletedFrom ==
+                                        Constant.currentUsre.email
+                                    ? const SizedBox.shrink()
+                                    : GestureDetector(
+                                        onTap: () {
+                                          readContext.onTabMessage(
+                                              index, isme, message, context);
+                                        },
+                                        onLongPress: () {
+                                          context
+                                              .read<ChatProvider>()
+                                              .onLongPressMessage(
+                                                  message,
+                                                  isme,
+                                                  index,
+                                                  snapshot.data!.docs.length);
+                                        },
+                                        child: MessageRow(
+                                            chatId: chatId,
+                                            index: index,
+                                            isme: isme,
+                                            friend: friend,
+                                            message: message));
+                              },
+                            );
+                          } else {
+                            return Center(
+                              child: LoadingPage(
+                                  fullWidth: false,
+                                  deviceSize: MediaQuery.of(context).size),
+                            );
+                          }
+                        },
+                      )),
+                      !readContext.isMainAppBar && !readContext.editMode
+                          ? const AlternativeBottomInput()
+                          : InputBottom(chatId: chatId, freind: friend),
+                    ],
+                  ),
+                ),
+              )),
+        ),
       ),
     );
   }
@@ -164,23 +190,77 @@ class _ChatePageState extends State<ChatePage> {
             itemBuilder: (context) => [
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: () async {},
+                      onPressed: () async {
+                        ImagePicker imagePicker = ImagePicker();
+                        var pickedImage = await imagePicker.pickImage(
+                            source: ImageSource.gallery);
+                        if (pickedImage != null) {
+                          File image = File(pickedImage.path);
+                          SharedPreferences db =
+                              await SharedPreferences.getInstance();
+                          var data = db.getString('backgroundImages');
+                          if (data != null) {
+                            Map<String, dynamic> backgroundImages =
+                                jsonDecode(data);
+                            backgroundImages[friend.email] = image.path;
+                            db.setString('backgroundImages',
+                                jsonEncode(backgroundImages));
+                          } else {
+                            Map<String, dynamic> backgroundImages = {
+                              friend.email: image.path
+                            };
+                            db.setString('backgroundImages',
+                                jsonEncode(backgroundImages));
+                          }
+                        }
+                        setState(() {});
+                        Navigator.of(context).pop();
+                      },
                       child: Text(
-                        'Choose an image for background',
+                        'Set background image',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: deviceWidth * 0.035,
+                          fontSize: deviceWidth * 0.04,
+                          fontWeight: FontWeight.bold,
                           color: Theme.of(context).textTheme.titleLarge!.color,
                         ),
                       ))),
               PopupMenuItem(
                   child: TextButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        SharedPreferences db =
+                            await SharedPreferences.getInstance();
+                        var s = db.getString('backgroundImages');
+                        print(s);
+                      },
                       child: Text(
                         'Clear chat history',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          fontSize: deviceWidth * 0.035,
+                          fontSize: deviceWidth * 0.04,
+                          color: Theme.of(context).textTheme.titleLarge!.color,
+                        ),
+                      ))),
+              PopupMenuItem(
+                  child: TextButton(
+                      onPressed: () async {
+                        SharedPreferences db =
+                            await SharedPreferences.getInstance();
+                        var s = db.getString('backgroundImages');
+                        if (s != null) {
+                          Map<String, dynamic> backgroundImages = jsonDecode(s);
+                          backgroundImages.remove(friend.email);
+                          db.setString(
+                              'backgroundImages', jsonEncode(backgroundImages));
+                          setState(() {});
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      child: Text(
+                        'Remove background image',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: deviceWidth * 0.04,
                           color: Theme.of(context).textTheme.titleLarge!.color,
                         ),
                       ))),

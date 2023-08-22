@@ -33,7 +33,6 @@ class FriendList extends StatelessWidget {
                           padding:
                               const EdgeInsets.only(top: 2, left: 2, right: 2),
                           child: FriendTile(
-                          friendEmail:  snapshot.data!.docs[0].data()['to'],
                               nameLetters: getNameLetters(
                                   snapshot.data!.docs[index].data()['toName']),
                               snapshot: snapshot,

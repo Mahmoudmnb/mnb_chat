@@ -15,25 +15,13 @@ class FriendTile extends StatelessWidget {
   final int index;
   final String currentFriendNum;
   final String nameLetters;
-  final String friendEmail;
-  String? imgUrl;
-  FriendTile(
-      {Key? key,
-      required this.snapshot,
-      required this.index,
-      required this.currentFriendNum,
-      required this.nameLetters,
-      required this.friendEmail})
-      : super(key: key) {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(friendEmail)
-        .get()
-        .then((value) {
-      imgUrl = value.data()!['ImgUrl'];
-      print(imgUrl);
-    });
-  }
+  FriendTile({
+    Key? key,
+    required this.snapshot,
+    required this.index,
+    required this.currentFriendNum,
+    required this.nameLetters,
+  }) : super(key: key) {}
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +47,6 @@ class FriendTile extends StatelessWidget {
               : snapshot.data!.docs[index].data()['to'],
         };
         chatReadContext.friend = UserModel.fromJson(map);
-        //! I edited som codes here in createChat
         String chatId = await chatReadContext.createChat();
         homeReadContext.setCurrentFriendNum = map['email'];
         Navigator.of(context)
@@ -74,6 +61,9 @@ class FriendTile extends StatelessWidget {
       }
     }
 
+    snapshot.data!.docs.forEach((element) {
+      print(element.data()['toImage']);
+    });
     return ListTile(
       shape: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
@@ -87,18 +77,21 @@ class FriendTile extends StatelessWidget {
                   .collection('msg')
                   .where('to', isEqualTo: Constant.currentUsre.email)
                   .where('isReseved', isEqualTo: false)
-                  .snapshots(),
+                  .snapshots(includeMetadataChanges: true),
               builder: (context, snapshot1) {
                 return snapshot1.data != null && snapshot1.data!.docs.isNotEmpty
                     ? Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 2),
                         decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.background,
+                            color:
+                                Theme.of(context).textTheme.titleLarge!.color,
                             borderRadius: BorderRadius.circular(15)),
                         child: Text(
                           (snapshot1.data?.docs.length).toString(),
                           overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.background),
                         ),
                       )
                     : const SizedBox.shrink();
@@ -106,24 +99,36 @@ class FriendTile extends StatelessWidget {
             )
           : const SizedBox.shrink(),
       onTap: onTabFreinTile,
-      leading: Container(
-        alignment: Alignment.center,
-        height: 50,
-        width: 50,
-        decoration: BoxDecoration(
-            color: AppTheme.nameColors[nameLetters[0]] ?? Colors.cyan,
-            shape: BoxShape.circle),
-        child: imgUrl == '' || imgUrl == null
-            ? Text(
+      leading: snapshot.data!.docs[index].data()['toImage'] == null
+          ? Container(
+              alignment: Alignment.center,
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                  color: AppTheme.nameColors[nameLetters[0]] ?? Colors.cyan,
+                  shape: BoxShape.circle),
+              child: Text(
                 nameLetters,
                 style:
                     const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              )
-            : ClipRRect(
+              ))
+          : SizedBox(
+              height: 50,
+              width: 50,
+              child: ClipRRect(
                 borderRadius: BorderRadius.circular(500),
-                child: CachedNetworkImage(imageUrl: imgUrl!),
+                child: CachedNetworkImage(
+                    errorWidget: (context, url, error) => Text(
+                          nameLetters,
+                          style: TextStyle(
+                              fontSize: deviceSize.width * 0.08,
+                              fontWeight: FontWeight.bold),
+                        ),
+                    progressIndicatorBuilder: (context, url, progress) =>
+                        CircularProgressIndicator(),
+                    imageUrl: snapshot.data!.docs[index].data()['toImage']),
               ),
-      ),
+            ),
       tileColor: Theme.of(context).colorScheme.onBackground,
       title: Text(
         snapshot.data!.docs[index].data()['toName'].toString(),
