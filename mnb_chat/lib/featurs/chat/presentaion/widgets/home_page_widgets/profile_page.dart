@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -15,7 +14,6 @@ import '../../../../../core/app_theme.dart';
 import '../../../../../core/constant.dart';
 
 import '../../../../Auth/presentation/pages/auth_page.dart';
-import '../../../../auth/models/user_model.dart';
 import '../profile_widgets/list_tile_settting.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -218,6 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String getNameLetters(String name) {
     var splitedName = name.split(' ');
+    print(splitedName);
     var f = splitedName.length == 1
         ? splitedName.first.characters.first
         : splitedName.first.characters.first +
@@ -395,8 +394,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                    onPressed: () {
-                      print(Constant.currentUsre.email);
+                    onPressed: () async {
                       isLoding = true;
                       setState(() {});
                       ToastContext().init(context);
@@ -412,74 +410,111 @@ class _ProfilePageState extends State<ProfilePage> {
                         Toast.show('password should be more than six letters',
                             duration: 2);
                       } else {
-                        FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(Constant.currentUsre.email)
-                            .update({
+                        Map<String, dynamic> data = {
                           'email': emailCon.text,
                           'name': nameCon.text,
                           'password': passCon.text
-                        }).onError((error, stackTrace) {
+                        };
+                        List<Map<String, dynamic>> f = [];
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(Constant.currentUsre.email)
+                            .collection('friends')
+                            .snapshots()
+                            .listen((event) {
+                          event.docs.forEach((element) {
+                            f.add(element.data());
+                          });
+                          print(f);
+                        });
+                        //! comment this
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(Constant.currentUsre.email)
+                            .delete();
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(emailCon.text)
+                            .set(data)
+                            .onError((error, stackTrace) {
                           print(error);
                           isLoding = false;
                           setState(() {});
                         }).then((value) {
-                          //!jdjlkfjkjdfljdssljflkjldkfjlsdjdsflkjlkadjfoiejfioejlfjdsklfjdsoijfoisdjfj
-                          var s = FirebaseFirestore.instance
-                              .collection('users')
-                              .snapshots();
-                          s.listen((event1) {
-                            event1.docs.forEach((element) {
-                              FirebaseFirestore.instance
-                                  .collection('users')
-                                  .doc(element.id)
-                                  .collection('friends')
-                                  .snapshots()
-                                  .listen((event2) {
-                                event2.docs.forEach((element2) async {
-                                  if (element2.id ==
-                                      Constant.currentUsre.email) {
-                                    FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(element.id)
-                                        .collection('friends')
-                                        .doc(element2.id)
-                                        .get()
-                                        .then((value) {
-                                      var data = value.data();
-                                      data!['toName'] = nameCon.text;
-                                      data['to'] = emailCon.text;
-                                      FirebaseFirestore.instance
-                                          .collection('users')
-                                          .doc(element.id)
-                                          .collection('friends')
-                                          .doc(element2.id)
-                                          .delete()
-                                          .then((value) {
-                                        FirebaseFirestore.instance
-                                            .collection('users')
-                                            .doc(element.id)
-                                            .collection('friends')
-                                            .doc(emailCon.text)
-                                            .set(data);
-                                      });
-
-                                      var token = Constant.currentUsre.token;
-                                      Constant.currentUsre = UserModel(
-                                          password: passCon.text,
-                                          name: nameCon.text,
-                                          email: emailCon.text,
-                                          token: token);
-                                    });
-                                  }
-                                });
-                              });
-                            });
+                          print(f);
+                          f.forEach((e) {
+                            print('hihihihi');
+                            print(e['to']);
+                            // FirebaseFirestore.instance
+                            //     .collection('users')
+                            //     .doc(emailCon.text)
+                            //     .collection('friends')
+                            //     .doc(e['to'])
+                            //     .set(e);
                           });
-
                           isLoding = false;
                           setState(() {});
-                          Navigator.of(context).pop();
+//                           //!                    jdjlkfjkjdfljdssljflkjldkfjlsdjdsflkjlkadjfoiejfioejlfjdsklfjdsoijfoisdjfj
+//                           var s = FirebaseFirestore.instance
+//                               .collection('users')
+//                               .snapshots();
+//                           s.listen((event1) {
+//                             event1.docs.forEach((element) {
+//                               if (element.id != Constant.currentUsre.email) {
+//                                 FirebaseFirestore.instance
+//                                     .collection('users')
+//                                     .doc(element.id)
+//                                     .collection('friends')
+//                                     .snapshots()
+//                                     .listen((event2) {
+//                                   event2.docs.forEach((element2) async {
+//                                     if (element2.id ==
+//                                         Constant.currentUsre.email) {
+//                                       var user = await FirebaseFirestore
+//                                           .instance
+//                                           .collection('users')
+//                                           .doc(element.id)
+//                                           .collection('friends')
+//                                           .doc(element2.id)
+//                                           .get();
+//                                       Map<String, dynamic> u = user.data()!;
+//                                       u['toName'] = nameCon.text;
+//                                       u['to'] = emailCon.text;
+//                                       await FirebaseFirestore.instance
+//                                           .collection('users')
+//                                           .doc(element.id)
+//                                           .collection('friends')
+//                                           .doc(element2.id)
+//                                           .delete();
+//                                       await FirebaseFirestore.instance
+//                                           .collection('users')
+//                                           .doc(element.id)
+//                                           .collection('friends')
+//                                           .doc(emailCon.text)
+//                                           .set(u);
+//                                       UserModel userModel =
+//                                           Constant.currentUsre;
+//                                       Constant.currentUsre = UserModel(
+//                                           password: passCon.text,
+//                                           name: nameCon.text,
+//                                           email: emailCon.text,
+//                                           token: userModel.token);
+//                                       SharedPreferences db =
+//                                           await SharedPreferences.getInstance();
+//                                       db.setString(
+//                                           'currentUser',
+//                                           jsonEncode(
+//                                               Constant.currentUsre.toJson()));
+//                                     }
+//                                   });
+//                                 });
+//                               }
+//                             });
+//                           });
+//
+//                           isLoding = false;
+//                           setState(() {});
+//                           Navigator.of(context).pop();
                         });
                       }
                     },

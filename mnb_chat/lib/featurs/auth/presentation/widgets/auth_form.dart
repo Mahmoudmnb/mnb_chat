@@ -149,10 +149,10 @@ class _AuthFormState extends State<AuthForm> {
       },
       onSaved: (newValue) {
         label == 'Password'
-            ? context.read<AuthProvider>().setPassword = newValue!
+            ? context.read<AuthProvider>().setPassword = newValue!.trim()
             : label == 'E-mail adress'
-                ? context.read<AuthProvider>().setEmail = newValue!
-                : context.read<AuthProvider>().setName = newValue!;
+                ? context.read<AuthProvider>().setEmail = newValue!.trim()
+                : context.read<AuthProvider>().setName = newValue!.trim();
       },
     );
   }

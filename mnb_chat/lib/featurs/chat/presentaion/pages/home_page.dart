@@ -29,7 +29,8 @@ class _HomePageState extends State<HomePage>
   String currentFriendNum = '';
   @override
   void initState() {
-    context.read<ChatProvider>().pageController = PageController();
+    context.read<ChatProvider>().pageController =
+        PageController(initialPage: 0);
     getPermision();
     initInfo();
     super.initState();
