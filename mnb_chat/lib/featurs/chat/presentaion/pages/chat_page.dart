@@ -180,6 +180,12 @@ class _ChatePageState extends State<ChatePage> {
         backgroundColor:
             Theme.of(context).colorScheme.onPrimary.withOpacity(0.5),
         leadingWidth: deviceWidth * 0.1,
+        leading: IconButton(
+            onPressed: () {
+              context.read<ChatProvider>().setConvertedMode = false;
+              Navigator.of(context).pop();
+            },
+            icon: Icon(Icons.arrow_back)),
         actions: [
           PopupMenuButton(
             color: Theme.of(context).colorScheme.background.withOpacity(0.9),

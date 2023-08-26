@@ -104,6 +104,7 @@ class ChatProvider extends ChangeNotifier {
 
 //* detect what back button should do
   Future<bool> willPopScopeOnTab() async {
+    setConvertedMode = false;
     if (!isMainAppBar) {
       setMainAppBar = true;
       selectedMessages = [];
@@ -711,9 +712,6 @@ class ChatProvider extends ChangeNotifier {
           .update({'messageId': s.id, 'isSent': true});
       moveToEnd();
     }
-    isConvertedMode = false;
-
-    notifyListeners();
   }
 
   uploadVoice(File voice, String id, String duration, String chatId) async {

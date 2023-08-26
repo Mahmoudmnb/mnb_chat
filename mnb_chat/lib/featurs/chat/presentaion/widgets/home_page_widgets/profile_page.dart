@@ -14,6 +14,7 @@ import '../../../../../core/app_theme.dart';
 import '../../../../../core/constant.dart';
 
 import '../../../../Auth/presentation/pages/auth_page.dart';
+import '../../../../auth/models/user_model.dart';
 import '../profile_widgets/list_tile_settting.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -187,7 +188,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       .listen((event2) {
                     event2.docs.forEach((element2) async {
                       if (element2.id == Constant.currentUsre.email) {
-                        print(element2.id);
                         FirebaseFirestore.instance
                             .collection('users')
                             .doc(element.id)
@@ -216,7 +216,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   String getNameLetters(String name) {
     var splitedName = name.split(' ');
-    print(splitedName);
     var f = splitedName.length == 1
         ? splitedName.first.characters.first
         : splitedName.first.characters.first +
@@ -276,8 +275,6 @@ class _ProfilePageState extends State<ProfilePage> {
     bool isLoding = false;
     TextEditingController nameCon =
         TextEditingController(text: Constant.currentUsre.name);
-    TextEditingController emailCon =
-        TextEditingController(text: Constant.currentUsre.email);
     TextEditingController passCon =
         TextEditingController(text: Constant.currentUsre.password);
     showDialog(
@@ -291,7 +288,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         content: StatefulBuilder(
           builder: (context, setState) => SizedBox(
-            height: deviceHight * 0.45,
+            height: deviceHight * 0.3,
             width: deviceWidth * 0.8,
             child: Column(
               children: [
@@ -321,41 +318,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   validator: (value) {
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  style: TextStyle(
-                      color: Theme.of(context).textTheme.titleLarge!.color),
-                  controller: emailCon,
-                  keyboardType: TextInputType.text,
-                  cursorColor: Theme.of(context).textTheme.titleLarge!.color,
-                  decoration: InputDecoration(
-                    errorStyle: const TextStyle(color: Colors.red),
-                    focusedErrorBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red)),
-                    errorBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red)),
-                    labelStyle: const TextStyle(color: Colors.black),
-                    suffixIconColor: Colors.black,
-                    focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black)),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.grey.shade500)),
-                    label: Text(
-                      'E-mail',
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: Theme.of(context).textTheme.titleLarge!.color),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (emailCon.text.isEmpty ||
-                        !emailCon.text.contains('@') ||
-                        !emailCon.text.contains('.com')) {
-                      return 'invalid Email';
-                    }
                     return null;
                   },
                 ),
@@ -394,127 +356,38 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                    onPressed: () async {
+                    onPressed: () {
                       isLoding = true;
                       setState(() {});
                       ToastContext().init(context);
                       if (nameCon.text.isEmpty || nameCon.text.length < 6) {
                         Toast.show('name should be more than six letters',
                             duration: 2);
-                      } else if (emailCon.text.isEmpty ||
-                          !emailCon.text.contains('@') ||
-                          !emailCon.text.contains('.com')) {
-                        Toast.show('Invalid E-mail', duration: 2);
                       } else if (nameCon.text.isEmpty ||
                           nameCon.text.length < 6) {
                         Toast.show('password should be more than six letters',
                             duration: 2);
                       } else {
-                        Map<String, dynamic> data = {
-                          'email': emailCon.text,
-                          'name': nameCon.text,
-                          'password': passCon.text
-                        };
-                        List<Map<String, dynamic>> f = [];
-                        await FirebaseFirestore.instance
+                        FirebaseFirestore.instance
                             .collection('users')
                             .doc(Constant.currentUsre.email)
-                            .collection('friends')
-                            .snapshots()
-                            .listen((event) {
-                          event.docs.forEach((element) {
-                            f.add(element.data());
-                          });
-                          print(f);
-                        });
-                        //! comment this
-                        await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(Constant.currentUsre.email)
-                            .delete();
-                        await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(emailCon.text)
-                            .set(data)
-                            .onError((error, stackTrace) {
-                          print(error);
+                            .update({
+                          'name': nameCon.text.trim(),
+                          'password': passCon.text.trim()
+                        }).then((value) async {
+                          UserModel userModel = Constant.currentUsre;
+                          Constant.currentUsre = UserModel(
+                              password: passCon.text.trim(),
+                              name: nameCon.text.trim(),
+                              email: userModel.email,
+                              token: userModel.token);
+                          SharedPreferences db =
+                              await SharedPreferences.getInstance();
+                          db.setString('currentUser',
+                              jsonEncode(Constant.currentUsre.toJson()));
                           isLoding = false;
                           setState(() {});
-                        }).then((value) {
-                          print(f);
-                          f.forEach((e) {
-                            print('hihihihi');
-                            print(e['to']);
-                            // FirebaseFirestore.instance
-                            //     .collection('users')
-                            //     .doc(emailCon.text)
-                            //     .collection('friends')
-                            //     .doc(e['to'])
-                            //     .set(e);
-                          });
-                          isLoding = false;
-                          setState(() {});
-//                           //!                    jdjlkfjkjdfljdssljflkjldkfjlsdjdsflkjlkadjfoiejfioejlfjdsklfjdsoijfoisdjfj
-//                           var s = FirebaseFirestore.instance
-//                               .collection('users')
-//                               .snapshots();
-//                           s.listen((event1) {
-//                             event1.docs.forEach((element) {
-//                               if (element.id != Constant.currentUsre.email) {
-//                                 FirebaseFirestore.instance
-//                                     .collection('users')
-//                                     .doc(element.id)
-//                                     .collection('friends')
-//                                     .snapshots()
-//                                     .listen((event2) {
-//                                   event2.docs.forEach((element2) async {
-//                                     if (element2.id ==
-//                                         Constant.currentUsre.email) {
-//                                       var user = await FirebaseFirestore
-//                                           .instance
-//                                           .collection('users')
-//                                           .doc(element.id)
-//                                           .collection('friends')
-//                                           .doc(element2.id)
-//                                           .get();
-//                                       Map<String, dynamic> u = user.data()!;
-//                                       u['toName'] = nameCon.text;
-//                                       u['to'] = emailCon.text;
-//                                       await FirebaseFirestore.instance
-//                                           .collection('users')
-//                                           .doc(element.id)
-//                                           .collection('friends')
-//                                           .doc(element2.id)
-//                                           .delete();
-//                                       await FirebaseFirestore.instance
-//                                           .collection('users')
-//                                           .doc(element.id)
-//                                           .collection('friends')
-//                                           .doc(emailCon.text)
-//                                           .set(u);
-//                                       UserModel userModel =
-//                                           Constant.currentUsre;
-//                                       Constant.currentUsre = UserModel(
-//                                           password: passCon.text,
-//                                           name: nameCon.text,
-//                                           email: emailCon.text,
-//                                           token: userModel.token);
-//                                       SharedPreferences db =
-//                                           await SharedPreferences.getInstance();
-//                                       db.setString(
-//                                           'currentUser',
-//                                           jsonEncode(
-//                                               Constant.currentUsre.toJson()));
-//                                     }
-//                                   });
-//                                 });
-//                               }
-//                             });
-//                           });
-//
-//                           isLoding = false;
-//                           setState(() {});
-//                           Navigator.of(context).pop();
+                          Navigator.of(context).pop();
                         });
                       }
                     },
@@ -530,6 +403,8 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-    );
+    ).then((value) {
+      setState(() {});
+    });
   }
 }

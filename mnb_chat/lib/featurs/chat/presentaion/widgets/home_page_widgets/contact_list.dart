@@ -32,7 +32,7 @@ class ContactList extends StatelessWidget {
         context.read<ChatProvider>().friend = friend;
         String chatId = await context.read<ChatProvider>().createChat();
         currentFriendNum = friend.email;
-        
+
         Navigator.of(context)
             .push(MaterialPageRoute(
           builder: (context) => ChatePage(
@@ -159,7 +159,7 @@ class ContactList extends StatelessWidget {
   }
 
   String getNameLetters(String name) {
-    var splitedName = name.split(' ');
+    var splitedName = name.trim().split(' ');
     var f = splitedName.length == 1
         ? splitedName.first.characters.first
         : splitedName.first.characters.first +
