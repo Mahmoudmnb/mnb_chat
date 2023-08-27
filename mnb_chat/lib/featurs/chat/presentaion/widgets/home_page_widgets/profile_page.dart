@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mnb_chat/featurs/chat/presentaion/providers/chat_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
@@ -145,7 +147,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     ListTileSetting(
                         text: 'Log out',
                         icon: Icons.exit_to_app,
-                        onTap: () => logOut(context),
+                        onTap: () {
+                          context.read<ChatProvider>().setSelectedPage = 0;
+                          context.read<ChatProvider>().pageController =
+                              PageController(initialPage: 0);
+
+                          logOut(context);
+                        },
                         deviceWidth: deviceWidth),
                   ],
                 )))
@@ -215,7 +223,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   String getNameLetters(String name) {
-    var splitedName = name.split(' ');
+    var splitedName = name.trim().split(' ');
     var f = splitedName.length == 1
         ? splitedName.first.characters.first
         : splitedName.first.characters.first +

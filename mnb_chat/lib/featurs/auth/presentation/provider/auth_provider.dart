@@ -160,10 +160,15 @@ class AuthProvider extends ChangeNotifier {
         isError = true;
       }
       if (!isError) {
+        var u = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.user!.email!)
+            .get();
+        String userName = u.data()!['name'];
         String? token = await FirebaseMessaging.instance.getToken();
         Constant.currentUsre = UserModel(
-            name: _name,
-            email: user!.user!.email!,
+            name: userName,
+            email: user.user!.email!,
             token: token!,
             password: _password);
         SharedPreferences db = await SharedPreferences.getInstance();
