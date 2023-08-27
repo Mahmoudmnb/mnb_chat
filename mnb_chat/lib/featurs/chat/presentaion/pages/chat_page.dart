@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mnb_chat/core/app_theme.dart';
@@ -234,10 +236,48 @@ class _ChatePageState extends State<ChatePage> {
               PopupMenuItem(
                   child: TextButton(
                       onPressed: () async {
-                        SharedPreferences db =
-                            await SharedPreferences.getInstance();
-                        var s = db.getString('backgroundImages');
-                        print(s);
+                        var data = FirebaseFirestore.instance
+                            .collection('messages')
+                            .doc(chatId)
+                            .collection('msg')
+                            .snapshots();
+                        data.every((element) {
+                          element.docs.forEach((element) async {
+                            String? n = element.data()['deletedFrom'];
+                            if (n == null ||
+                                n.compareTo(Constant.currentUsre.email) == 0) {
+                              print('hi');
+                              await FirebaseFirestore.instance
+                                  .collection('messages')
+                                  .doc(chatId)
+                                  .collection('msg')
+                                  .doc(element.id)
+                                  .update({
+                                'deletedFrom': Constant.currentUsre.email
+                              });
+                            } else {
+                              await FirebaseFirestore.instance
+                                  .collection('messages')
+                                  .doc(chatId)
+                                  .collection('msg')
+                                  .doc(element.id)
+                                  .delete();
+                              if (element.data()['type'] == 'Image') {
+                                await FirebaseStorage.instance
+                                    .ref('chat')
+                                    .child(element.data()['messageId'])
+                                    .delete();
+                                if (element.data()['reciverPath'] != null) {
+                                  File imageFile =
+                                      File(element.data()['reciverPath']!);
+                                  await imageFile.delete();
+                                }
+                              }
+                            }
+                          });
+                          return false;
+                        });
+                        Navigator.of(context).pop();
                       },
                       child: Text(
                         'Clear chat history',

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/constant.dart';
+import '../../../../firebase_options.dart';
 import '../../../auth/models/user_model.dart';
 import '../../models/message.dart';
 import 'home_provider.dart';
@@ -421,19 +423,34 @@ class ChatProvider extends ChangeNotifier {
             Constant.currentUsre);
         controller.text = '';
         _inputText = '';
+          await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseFirestore.instance.settings = const Settings(
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED, persistenceEnabled: true);
+        await FirebaseFirestore.instance
+            .collection('messages')
+            .doc(chatId)
+            .collection('msg')
+            .get()
+            .then((value) => print(value));
         await FirebaseFirestore.instance
             .collection('messages')
             .doc(chatId)
             .collection('msg')
             .doc(id)
-            .set(message.toMap())
+            .set(message.toMap(), SetOptions(merge: true))
             .then((value) async {
-          await FirebaseFirestore.instance
-              .collection('messages')
-              .doc(chatId)
-              .collection('msg')
-              .doc(id)
-              .update({'isSent': true});
+          try {
+            await FirebaseFirestore.instance
+                .collection('messages')
+                .doc(chatId)
+                .collection('msg')
+                .doc(id)
+                .update({'isSent': true});
+          } catch (e) {
+            print(e);
+          }
         });
         moveToEnd();
       }
